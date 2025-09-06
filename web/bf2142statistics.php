@@ -631,8 +631,8 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 }
                 //pdt	Unique Dog Tags Collected
                 //pdtc	Dog Tags Collected
-                if (isset($data["pdt_$x"]) AND $data["pdt_$x"] > 0) {
-                    $query3p .= " `pdt`=(`pdtc`+" . $data["pdt_$x"] . "),";
+                if (isset($data["pdt_$x"])) {
+                    $query3p .= " `pdt`='" . $data["pdt_$x"] . "',";
                 }
                 if (isset($data["pdtc_$x"]) AND $data["pdtc_$x"] > 0) {
                     $query3p .= " `pdtc`=(`pdtc`+" . $data["pdtc_$x"] . "),";
@@ -755,11 +755,11 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 
                 //win	Wins
                 //los	Losses
-                $wins = $data2['win'];
+                $wins = $data2['wins'];
                 $losses = $data2['los'];
                 $pWin = false;
                 if ($data["c_$x"]) {
-                    if ($data['win'] == $data["t_$x"]) {
+                    if ($data['wins'] == $data["t_$x"]) {
                         $query3p .= " `wins`=(`wins`+1),";
                         $query3a .= " `_wins`=(`_wins`+1),";
                         $wins++;
@@ -1383,7 +1383,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
     } else {
         $row = mysql_fetch_array($result);
         $query = "UPDATE mapinfo SET
-			score = `score` + {$globals['mapscore']},
+			score = `score` + ({$globals['mapscore']}),
 			time = `time` + {$globals['roundtime']},
 			times = `times` + 1,
 			kills = `kills` + {$globals['mapkills']},

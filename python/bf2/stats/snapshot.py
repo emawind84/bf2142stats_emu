@@ -128,10 +128,12 @@ def getSnapShot():
 	# set standardKeys['v'] accordingly
 	#
 	running_mod = str(host.sgl_getModDirectory())
-	if ( running_mod == "mods/bf2142" ):
-		v_value = "bf2142"
+	if ( running_mod.lower() == 'mods/bf2142' ):
+		v_value = 'bf2142'
+	elif ( running_mod.lower() == 'mods/BF2142S.P.EX' ):
+		v_value = 'bf2142spex'
 	else:
-		v_value = "!!!ERROR!!! fixme"
+		v_value = 'bf2142'
 
 	if g_debug: print "snapshot.py: Running MOD: %s" % (str(v_value))
 
