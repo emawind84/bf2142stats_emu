@@ -379,6 +379,7 @@ CREATE TABLE IF NOT EXISTS `stats_v` (
   `vkdr-11` int(11) unsigned NOT NULL DEFAULT '0',
   `vkdr-12` int(11) unsigned NOT NULL DEFAULT '0',
   `vkdr-13` int(11) unsigned NOT NULL DEFAULT '0',
+  `vkdr-14` int(11) unsigned NOT NULL DEFAULT '0',
   `vkls-0` int(11) unsigned NOT NULL DEFAULT '0',
   `vkls-1` int(11) unsigned NOT NULL DEFAULT '0',
   `vkls-2` int(11) unsigned NOT NULL DEFAULT '0',
