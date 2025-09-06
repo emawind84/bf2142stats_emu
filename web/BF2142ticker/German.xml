@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<news>
-	<newsitem header="Последние новости" imageUrl="http://127.0.0.1/BF2142EANews/newsreader_screen.png">
-		<p>News</p>		
+<newsticker>
+	<newsitem>
+	Game Tip: Choose Bauer H-AR for mid to long range firefights and the Voss L-AR in high intensity close quarter fighting.
 	</newsitem>
-</news>
+	<newsitem>
+ 	DICE möchte euch danken, dass ihr euch bei den Combatstudios angemeldet und bei der Closed Beta von Northern Strike mitgewirkt habt. Vielen Dank auch an all diejenigen, die nach wie vor die weiterhin laufende Open Beta 1.2 spielen.
+        </newsitem>
+	<newsitem>
+ 	Sichert euch euren Platz in der vordersten Reihe der Kampflinie - Über EA-Link könnt ihr ab sofort eure Vorbestellung für Northern Strike ordern!
+        </newsitem>
+	<newsitem>
+        Diejenigen unter euch, die mehr Vorbereitung auf die intensiven Kämpfe in Battlefield 2142: Northern Strike benötigen, können sich nun über www.northernstriketraining.ea.com mehr Frontinformationen über die neuen Schlachtfelder und Vehikel des Krieges besorgen.
+	</newsitem>
+        <newsitem>
+        Community-Event: Wir haben damit begonnen, von Spielern erstellte Bilder anzunehmen, die wir nach einer Überprüfung eventuell als Anzeigen ins Spiel aufnehmen werden! Schicke uns dein Bild, dann könnte es ins Spiel integriert werden – sichtbar für Spieler auf der ganzen Welt. battlefield.ea.com/adidea/
+	</newsitem>
+        <newsitem>
+	 Neuigkeiten vom Schlachtfeld: In dieser Woche gibt es keinen Supreme Commander! Kämpft härter, Soldaten!
+	</newsitem>
+        <newsitem>
+	Spiel-Tipp: Denk daran, dass du an APM-Minen vorbeikommst, wenn du geduckt bist oder dich liegend fortbewegst.
+	</newsitem>
+        <newsitem>
+	News: Wirf einen Blick auf die erste Welle der Prima Map-Strategien für Battlefield 2142, verfügbar unter battlefield.ea.com
+	</newsitem>
+	<newsitem>
+	News: Sieh dir den Spielerprofil-Bereich des Battlefield-Portals an. Hier findest du detaillierte Statistiken über deine eigenen Leistungen und die anderer auf dem Schlachtfeld. Weitere Informationen erhältst du unter battlefield.ea.com.
+	</newsitem>
+	<newsitem>
+	Spiel-Tipp: Vergiss das DysTek-Pulsmeter nicht, wenn du den Titan angreifst. Er verrät deinen Kameraden die Positionen “campender” Gegner.
+	</newsitem>
+	<newsitem>
+	Game Tip: You can whisper to a player by double-clicking his name in the Manage tab of the score board.
+	</newsitem>
+	<newsitem>
+	News-Update: Wir geben die bevorstehende Veröffentlichung des Battlefield 2142 Northern Strike-Booster Packs bekannt!  Klicke hier, um weitere Informationen zu erhalten!
+	</newsitem>
+	<newsitem>
+	Spiel-Tipp: Sowohl bei den BattleWalkers als auch bei den FAVs kannst du mit der SHIFT-Taste einen Temposchub aktivieren.
+	</newsitem>
+	<newsitem>
+	Spiel-Tipp: BattleWalker haben Lüftungsöffnungen auf ihrer Unterseite, die gegen alle Waffenarten empfindlich sind.
+	</newsitem>
+	<newsitem>
+	News: Hast du Interesse an News und Updates über deine Battlefield-Mod oder deine Battlefield-Competition im News-Bereich unserer Website? Dann schicke sie uns an community@dice.se.
+	</newsitem>
+	<newsitem>
+	Neuigkeiten aus Spanien: Die spanische Battlefield 2142 Liga (LEB2142) nimmt ihren Betrieb auf. Bitte besucht www.ligabf2142.com für weitere Informationen.
+	</newsitem>
+	<newsitem>
+	EA Masters: Am Freitag, den 2. Februar startet die zweite Runde der Online Qualifier Turniere der EA Masters Liga. Alle weiteren Infos rund um EA Masters findet ihr unter www.eamasters.eu.
+	</newsitem>
+</newsticker>

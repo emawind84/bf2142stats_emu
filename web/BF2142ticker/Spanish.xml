@@ -1,6 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<news>
-	<newsitem header="Последние новости" imageUrl="http://127.0.0.1/BF2142EANews/newsreader_screen.png">
-		<p>News</p>		
+<newsticker>
+	<newsitem>
+	News: The final version of Battlefield 2142 1.4 is now available. Head over to www.battlefield.com to download it and play the new Highway Tampa map created by DICE in collaboration with Intel!
 	</newsitem>
-</news>
+	<newsitem>
+	News: Stat wipe figures for September are now out - over 700 stat padders and cheaters were wiped in that month. Head to www.battlefield.com for more detail on our ongoing anti-padding efforts. 
+	</newsitem>
+	<newsitem>
+	News: DICE Dog Tag Challenge 2 now over! Head over to battlefield.ea.com to see screenshots and stats from the event.
+	</newsitem>
+	<newsitem>
+	Info: Be sure to get the Northern Strike booster pack on EA Link!
+	</newsitem>
+	<newsitem>
+	Info: Please note that maps in Battlefield 2142: Northern Strike are only playable in multiplayer mode.
+	</newsitem>
+	<newsitem>
+	Game Tip: Its often better to revive a friend than kill an enemy.  Be sure to revive and heal your team mates when playing assault!
+	</newsitem>		
+	<newsitem>
+        News: For those of you who need more preparation for the intense battles in Battlefield 2142: Northern Strike, march over to the new www.northernstriketraining.ea.com site, where you�ll get more intel on the new battlegrounds and vehicles used in the war.
+	</newsitem>
+	<newsitem>
+	Game Tip: Remember that you can pass APM mines by crouching or crawling while prone. 
+	</newsitem>
+	<newsitem>
+	News: Check out the Player Profile section of battlefield.ea.com, with detailed stats of player achievements on the battlefield.
+	</newsitem>
+	<newsitem>
+	Game Tip: When assaulting the titan, be sure to bring your engineer defuser to clear out those pesky APM and RDX explosives.
+	</newsitem>   
+	<newsitem>
+	Game Tip: You can whisper to a player by double-clicking their name in the Manage tab of the score board.
+	</newsitem>
+	<newsitem>
+	Game Tip: Both Battle Walkers and FAV�s have a speed boost ability that can be used by pressing the shift key.
+	</newsitem>
+	<newsitem>
+	Game Tip: Battle Walkers have vents that are vulnerable to all weapon types located on their underside.
+	</newsitem>
+	<newsitem>
+	News: If you want news or updates about your Battlefield modification or your Battlefield competition in the news section, feel free to send them to us at community@dice.se	
+	</newsitem>
+</newsticker>

@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<news>
-	<newsitem header="Последние новости" imageUrl="http://127.0.0.1/BF2142EANews/newsreader_screen.png">
-		<p>News</p>		
+<newsticker>
+	<newsitem>
+We would like to remind players that Titan mode is not supported for over 48 players in a server. For a better play experience avoid 64 player Titan Mode servers.
 	</newsitem>
-</news>
+	<newsitem>
+Game Tip: The Gunship’s Guided Missile becomes more difficult to control the longer it flies.  Hit targets fast.
+	</newsitem>
+	<newsitem>
+Look to this space for news and information updates from your DICE Live team.
+	</newsitem>
+	<newsitem>
+	We're very proud to announce that there is a special edition of Battlefield 2142 - The DICE Collector's Edition - exclusively on EA Downloader. http://account.ea.com/products/en_GB/BF2142
+	</newsitem>
+	<newsitem>
+	ModLight - Every few weeks we will be reviewing a different mod and inviting all Battlefield Players to join us in gaming sessions on the ModLight Community Servers that will be hosted after each review.
+	</newsitem>
+	<newsitem>
+	Throw out the rules of engagement, this is all-out war! Dice and EA announce Battlefield: Bad Company, currently in development for Xbox 360 and Playstation 3.
+	</newsitem>
+</newsticker>

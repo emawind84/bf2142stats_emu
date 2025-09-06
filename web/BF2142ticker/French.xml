@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<news>
-	<newsitem header="Последние новости" imageUrl="http://127.0.0.1/BF2142EANews/newsreader_screen.png">
-		<p>News</p>		
+<newsticker>
+	<newsitem>
+	Game Tip: Choose Bauer H-AR for mid to long range firefights and the Voss L-AR in high intensity close quarter fighting.
 	</newsitem>
-</news>
+	<newsitem>
+	DICE would like to thank you for signing up at combatstudios and participating in the closed beta of Northern Strike and thank you to all the people still playing the still open 1.2 Beta. 
+	</newsitem>	
+	<newsitem>
+ 	Secure your place at the front of the frontlines - EA Link is now taking pre-orders for Northern Strike!
+        </newsitem>
+	<newsitem>
+        For those of you who need more preparation for the intense battles in Battlefield 2142: Northern Strike, march over to the new www.northernstriketraining.ea.com site, where you’ll get more intel on the new battlegrounds and vehicles used in the war.
+	</newsitem>
+        <newsitem>
+        Community Event: We have started accepting submissions for player made imagery that after review might be added to the in-game billboards! Submit your image to us and it may be included in the game - visible to players world wide. battlefield.ea.com/adidea/
+        </newsitem> 
+        <newsitem>
+	News: There is no Supreme Commander this week! Fight harder soldiers!
+	</newsitem>
+	<newsitem>
+	Game Tip: Remember that you can pass APM mines by crouching or crawling while prone. 
+	</newsitem>
+	<newsitem>
+	News: Check out the first wave of Prima map strategies for Battlefield 2142, available at battlefield.ea.com
+	</newsitem>
+	<newsitem>
+	News: Check out the Player Profile section of the Battlefield portal, with detailed stats from your and any other player's achievements on the battlefields. Go to battlefield.ea.com for further information.
+	</newsitem>
+	<newsitem>
+	Game Tip: When assaulting the titan, be sure to bring the Dystek Pulse Meter to reveal camping enemies to your squadmates. 
+	</newsitem>   
+	<newsitem>
+	Game Tip: You can whisper to a player by double-clicking their name in the Manage tab of the score board.
+	</newsitem>
+	<newsitem>
+	News Update: Announcing the coming release of the Battlefield 2142 Northern Strike booster pack!  Click here for more information!
+	</newsitem>
+	<newsitem>
+	Game Tip: Both Battle Walkers and FAV’s have a speed boost ability that can be used by pressing the shift key.
+	</newsitem>
+	<newsitem>
+	Game Tip: Battle Walkers have vents that are vulnerable to all weapon types located on their underside.
+	</newsitem>
+	<newsitem>
+	News: If you want news or updates about your Battlefield modification or your Battlefield competition in the news section, feel free to send them to us at community@dice.se	
+	</newsitem>
+	<newsitem>
+	News from Spain: The Spanish Battlefield 2142 League (LEB2142) has started now. Please, visit www.ligabf2142.com for more information.
+	</newsitem>  
+	<newsitem>
+	EA Masters: From Friday, 2nd February the 2nd round of the online qualifier league EA Masters starts. Check out further information @ www.eamasters.eu
+	</newsitem>
+</newsticker>

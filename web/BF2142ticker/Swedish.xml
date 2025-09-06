@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<news>
-	<newsitem header="Последние новости" imageUrl="http://127.0.0.1/BF2142EANews/newsreader_screen.png">
-		<p>News</p>		
+<newsticker>
+        <newsitem>
+        Have you installed EA Link? Do you get a CD-key error? Please go to the EA Support pages, there is a tool to fix your issue available!
 	</newsitem>
-</news>
+        <newsitem>
+        Gameplay tip: In Battlefield 2142 a kill assist is rewarded with half a point (as compared to one full point in BF2). At the end of each round only full points are added to your score.
+	</newsitem>
+        <newsitem>
+        Please make sure that the date and time of your system is correctly set. If your time is too much off this may cause the servers not registering the stats properly.
+	</newsitem>
+        <newsitem>
+        We are aware of some players experiencing PunkBuster kicks. We are working with PunkBuster to resolve this issue as quickly as possible. 
+	</newsitem>
+        <newsitem>
+        Currently there are known issues with stats tracking and we are working around the clock to remedy these issues. Currently the ranking up issue has been resolved with others soon to follow. Please keep an eye on the news ticker for more updates Soldier!
+	</newsitem>
+        <newsitem>
+        Thank you to all of you who bought the Collector's Edition of Battlefield 2142 on EA Downloader. We are working as fast as we can to put the finishing touches to the exclusive making-of video and we will send all customers an email as soon as everything is ready.
+	</newsitem>
+        <newsitem>
+        Welcome to the new Battlefield!  Take a moment to add your friends to your buddy list then jump into a server and explore the new maps and the new Titan Mode to find all your new favorites!
+	</newsitem>
+	<newsitem>
+	Keep your eyes on this space for community news updates event schedules and game tips from your DICE Live Team!
+	</newsitem>
+	<newsitem>
+	DICE Game Play Tip: The Zeller-H Heavy Sniper can take out enemy Mines and RDX packs.  Use it to help your squad avoid an ambush.
+	</newsitem>
+        <newsitem>
+        Patch Notice: We have become aware of an issue when installing the patch while the game is still running.  Please ensure that Battlefield 2142 is shut down before initiating the patch.  If the game is still running while the patch tries to install you will need to uninstall the game and re-install in order to correctly update your game version.  
+        </newsitem>
+        <newsitem>
+We would like to remind players that Titan mode is not supported for over 48 players in a server. For a better play experience avoid 64 player Titan Mode servers.
+	</newsitem>
+</newsticker>
