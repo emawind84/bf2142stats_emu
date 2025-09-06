@@ -1,6 +1,30 @@
 <?php
 //exit;
 
+
+/*
+| ---------------------------------------------------------------
+| Define Constants
+| ---------------------------------------------------------------
+*/
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__FILE__));
+define('SYSTEM_PATH', ROOT);
+
+
+/*
+| ---------------------------------------------------------------
+| Set Error Reporting and Zlib Compression
+| ---------------------------------------------------------------
+*/
+error_reporting(E_ALL);
+ini_set("log_errors", "1");
+if (!getenv('PHP_VERSION')) {
+    # Not running in docker. Log errors to file
+    ini_set("error_log", SYSTEM_PATH . DS . 'logs' . DS . 'php_errors.log');
+}
+ini_set("display_errors", "0");
+
 $r = $_REQUEST;
 $str = "";
 foreach ($r as $id => $val) {
@@ -27,6 +51,7 @@ if ((hexdec($code[6].$code[7].$code[4].$code[5].$code[2].$code[3].$code[0].$code
 28 87C3     31
 */
 
+$authPID = 0;
 //if(isset($_GET["pid"]) AND $_GET["pid"] != "") {	$authPID = $_GET["pid"];	}
 if(isset($_GET["nick"]) AND $_GET["nick"] != "") {	$nick = $_GET["nick"];	} else {	$nick = '%2a';	}
 //if(isset($_GET["pos"]) AND $_GET["pos"] != "" AND $_GET["pos"] > 1) {	$getPOS = $_GET["pos"];	} else {	$pos = 1;	}
@@ -43,16 +68,18 @@ H\tsearchpattern
 D\t".$nick."
 H\tpid\tnick";
 
-$query1 = "SELECT profileid, subaccount FROM `subaccount` WHERE subaccount REGEXP '".$nick."' LIMIT 20";
+$query1 = "SELECT id, subaccount FROM `subaccount` WHERE subaccount REGEXP '".$nick."' LIMIT 20";
 $result1 = mysql_query($query1) or die(mysql_error());
 if (!mysql_num_rows($result1)) {
 	errorcode(104);
 	exit;
 } else {
-	$row1 = mysql_fetch_array($result1);
-	$pid = $row1['profileid'];
-	$nickname = rawurldecode($row1['subaccount']);
-	$Out .= "\nD\t".$pid."\t".$nickname;
+	while ($row = mysql_fetch_array($result1)) {
+		$pid = $row['id'];
+		$nickname = rawurldecode($row['subaccount']);
+		$Out .= "\nD\t".$pid."\t".$nickname;
+		error_log(">>>".$row['subaccount']);
+	}
 }
 /*
 O
@@ -84,11 +111,11 @@ D	81838773	A$$INATOR
 $	426	$
 */
 $countOut = preg_replace('/[\t\n]/','',$Out);
-print $Out."\n$\t".strlen($countOut)."\t$\n";
+print $Out."\n$\t".strlen($countOut)."\t$";
 @mysql_close($connection);
 function errorcode($errorcode=104) {
 	$Out = "E\t".$errorcode;
 	$countOut = preg_replace('/[\t\n]/','',$Out);
-	print $Out."\n$\t".strlen($countOut)."\t$\n";
+	print $Out."\n$\t".strlen($countOut)."\t$";
 }
 ?>

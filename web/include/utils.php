@@ -1,6 +1,7 @@
 <?php
 
 DEFINE('_CODE_VER', '1.10.1');
+define('CONFIG_FILE', SYSTEM_PATH . DS . 'include/_ccconfig.php');
 
 /*
   This script checks a remote IP address against a list of authorised hosts/subnets
@@ -167,7 +168,9 @@ function ErrorLog($msg, $lvl) {
 
     if ($lvl <= $cfg->get('debug_lvl')) {
         $err_msg = date('Y-m-d H:i:s') . " -- " . $lvl_txt . $msg . "\n";
-        $file = @fopen($cfg->get('debug_log'), 'a');
+        $log = SYSTEM_PATH . DS . 'logs' . DS . $cfg->get('debug_log');
+        //$file = @fopen($cfg->get('debug_log'), 'a');
+        $file = @fopen($log, 'a');
         @fwrite($file, $err_msg);
         @fclose($file);
         //echo "<br />----------------------------------------------------------------------------------------------------<br />$err_msg";
@@ -245,7 +248,7 @@ function chkPath($path) {
 class Config {
 
     var $data = array();
-    var $configFile = 'include/_ccconfig.php'; //Default Config File
+    var $configFile = CONFIG_FILE; //Default Config File
 
     function Config() {
         $this->Load();

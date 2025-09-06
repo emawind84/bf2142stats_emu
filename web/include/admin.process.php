@@ -84,7 +84,7 @@ switch ($task) {
 		//processServerInfo();
 		break;
 	default:
-		showLoginForm();
+		//showLoginForm();
 		break;
 }
 
@@ -103,7 +103,8 @@ function showLog($msg) {
 	echo $outmsg;
 	
 	if ($cfg->get('admin_log') != '') {
-		$file = @fopen($cfg->get('admin_log'), 'a');
+		$log = SYSTEM_PATH . DS . 'logs' . DS . $cfg->get('admin_log');
+		$file = @fopen($log, 'a');
 		@fwrite($file, $outmsg);
 		@fclose($file);
 	}
@@ -165,7 +166,7 @@ function processClearDB() {
 	global $cfg;
 	$connection = @mysql_connect($cfg->get('db_host'), $cfg->get('db_user'), $cfg->get('db_pass'));
 	@mysql_select_db($cfg->get('db_name'), $connection) or die("Database Error: " . mysql_error());
-	$tables = array('awards','mapinfo','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks');
+	$tables = array('awards','mapinfo','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks','playerprogress');
 	foreach ($tables as $table) {
 		$query1 = 'TRUNCATE TABLE `'.$table.'`;';
 		$result1 = mysql_query($query1);
@@ -199,17 +200,25 @@ function processImportLogs() {
 	
 	// Find Log Files
 	showLog("Importing Log Files");
-	$regex = '([0-9]{4})([0-9]{2})([0-9]{2})_([0-9]{4})';
-		
-	$dir = opendir(chkPath($cfg->get('stats_logs')));
-	chdir(chkPath($cfg->get('stats_logs')));
+	
+	$path = chkPath(SYSTEM_PATH . DS . $cfg->get('stats_logs'));
+	$dir = opendir($path);
+	chdir($path);
+	$files = [];
+	$regex = '/.*([0-9]{4})([0-9]{2})([0-9]{2})_([0-9]{4}).*' . preg_quote($cfg->get('stats_ext'), '/') . '$/';
 	while (($file = readdir($dir)) !== false) {
-		if (strpos($file, $cfg->get('stats_ext')))
-		{
-			ereg($regex,$file,$sort);
-			$files[] = $sort[0] . "|" . $file;
+		// Skip dot directories
+		if ($file === '.' || $file === '..') {
+			continue;
+		}
+		// Match files starting with 'rawdata_' and ending with the desired extension
+		if (preg_match($regex, $file, $matches)) {
+			$files[] = $matches[0] . "|" . $file;
 		}
 	}
+
+	// Sort Files
+	sort($files, SORT_STRING);
 	
 	// Sort Files
 	sort($files, SORT_STRING);
@@ -218,15 +227,15 @@ function processImportLogs() {
 	for ($x = 0; $x < count($files); $x++) {
 		$file = explode("|",$files[$x]);
 		if(isset($file_p)) {
-			while(file_exists($file_p)) {
-				//loop
-			}
+			// while(file_exists($file_p)) {
+			// 	//loop
+			// }
 		}
 		$file_p = $file[1];
-		$fh = fsockopen('195.140.177.252', 80);
+		$fh = fsockopen($cfg->get('stats_server_host'), 80);
 		
 		fwrite($fh, "POST /bf2142statistics.php HTTP/1.1\r\n");
-		fwrite($fh, "HOST: localhost\r\n");
+		fwrite($fh, "HOST: " . $cfg->get('stats_server_host') . "\r\n");
 		fwrite($fh, "User-Agent: GameSpyHTTP/1.0\r\n");
 		fwrite($fh, "Content-Type: application/x-www-form-urlencoded\r\n");
 		
@@ -267,7 +276,7 @@ function processImportPlayers() {
 	DEFINE('__FAIL','<b><font color="red">Fail</font></b>');
 
 	showLog("include ea_support.php");
-	require_once("ea_support.php");
+	require_once(SYSTEM_PATH . DS . "ea_support.php");
 	showLog("Done! :)");
 	$bfcoding  = &new ea_stats();
 
@@ -289,7 +298,7 @@ function processImportPlayers() {
 	
 	showLog("auth = $auth");
 	
-	$getplayerinfo_base  = "http://stella.prod.gamespy.com/getplayerinfo.aspx?auth=$auth&mode=base";
+	$getplayerinfo_base  = "http://stella.prod.openspy.net/getplayerinfo.aspx?auth=$auth&mode=base";
 	showLog("getplayerinfo_base  = ".$getplayerinfo_base);
 	$playerinfoBase = getPageContents($getplayerinfo_base);
 /*	$playerinfoBase = array(
@@ -317,7 +326,7 @@ function processImportPlayers() {
 	$playerinfoData1 = parsePlayerInfo($playerinfoBase);
 	$playerinfoData2 = parseUnlocks($playerinfoBase);
 
-	$getawardsinfo = 'http://stella.prod.gamespy.com/getawardsinfo.aspx?auth='.$auth;
+	$getawardsinfo = 'http://stella.prod.openspy.com/getawardsinfo.aspx?auth='.$auth;
 	showLog("getawardsinfo => $getawardsinfo");
 	$playerinfoAwards = getPageContents($getawardsinfo);
 /*
@@ -363,7 +372,7 @@ function processImportPlayers() {
 //==>
 	if (!mysql_num_rows($result3)) {
 		showLog("Insert New!");
-		$query4 = "INSERT INTO subaccount SET subaccount = '".$nickname."', id = '".$superid.";";
+		$query4 = "INSERT INTO subaccount SET subaccount = '".$nickname."', id = '".$superid."', profileid = '" . $superid . "';";
 		showLog("$query4");
 		$result4 = mysql_query($query4);
 		checkSQLResult ($result4, $query4);

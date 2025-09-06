@@ -53,9 +53,9 @@ if (!mysql_num_rows($result1)) {
 $authPIDNick = rawurldecode($row1['subaccount']);
 
 $Out = "O
-H\tpid\tnick\tasof
-D\t".$authPID."\t".$authPIDNick."\t".$timestamp."
-H\taward\tlevel\twhen\tfirst";
+H\tpid\tnick\tasof\t
+D\t".$authPID."\t".$authPIDNick."\t".$timestamp."\t
+H\taward\tlevel\twhen\tfirst\t";
 
 	$query2 = "SELECT * FROM `awards` WHERE pid='".$authPID."'";
 	$result2 = mysql_query($query2) or die(mysql_error());
@@ -86,7 +86,7 @@ H\taward\tlevel\twhen\tfirst";
 			} else {
 				$level = $row2['alvl'];
 			}
-			$Out .= "\nD\t".$award."\t".$level."\t".$earned."\t".$first;
+			$Out .= "\nD\t".$award."\t".$level."\t".$earned."\t".$first."\t";
 		}
 	}
 

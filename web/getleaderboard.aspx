@@ -1,5 +1,30 @@
 <?php
 
+
+/*
+| ---------------------------------------------------------------
+| Define Constants
+| ---------------------------------------------------------------
+*/
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__FILE__));
+define('SYSTEM_PATH', ROOT);
+
+
+/*
+| ---------------------------------------------------------------
+| Set Error Reporting and Zlib Compression
+| ---------------------------------------------------------------
+*/
+error_reporting(E_ALL);
+ini_set("log_errors", "1");
+if (!getenv('PHP_VERSION')) {
+    # Not running in docker. Log errors to file
+    ini_set("error_log", SYSTEM_PATH . DS . 'logs' . DS . 'php_errors.log');
+}
+ini_set("display_errors", "0");
+
+
 $r = $_REQUEST;
 $str = "";
 foreach ($r as $id => $val) {
@@ -21,8 +46,8 @@ if (isset($_GET["auth"]) AND $_GET["auth"] != "") {
     echo "None: No error.";
     exit;
 }
-if (isset($_GET["pos"]) AND $_GET["pos"] != "" AND $_GET["pos"] >= 1) {
-    $getpos = $_GET["pos"];
+if (isset($_GET["pos"]) AND $_GET["pos"] != "") {
+    $getpos = $_GET["pos"] >= 1 ? $_GET["pos"] : 1;
 } else {
     errorcode(9981);
     exit;

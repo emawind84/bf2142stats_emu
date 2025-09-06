@@ -7,7 +7,7 @@
 # ------------------------------------------------------------------------------
 # backend (webserver) listening on TCP/IP address and port
 # ------------------------------------------------------------------------------
-http_backend_addr = 'stella.prod.gamespy.com'
+http_backend_addr = 'stella.prod.emawind.com'
 http_backend_port = 80
 
 # ------------------------------------------------------------------------------

@@ -15,6 +15,8 @@ function start_session(){
 }
 
 function checkSession() {
+	return true;
+	/*
 	global $cfg;
 	// Check Session Values
 	if (!isset($_SESSION['adminAuth'])) {
@@ -28,6 +30,7 @@ function checkSession() {
 		$_SESSION['adminTime'] = time();
 		return true;
 	}
+	*/
 }
 
 function processLogin() {

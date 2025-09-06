@@ -1,5 +1,30 @@
 <?php
 
+
+/*
+| ---------------------------------------------------------------
+| Define Constants
+| ---------------------------------------------------------------
+*/
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__FILE__));
+define('SYSTEM_PATH', ROOT);
+
+
+/*
+| ---------------------------------------------------------------
+| Set Error Reporting and Zlib Compression
+| ---------------------------------------------------------------
+*/
+error_reporting(E_ALL);
+ini_set("log_errors", "1");
+if (!getenv('PHP_VERSION')) {
+    # Not running in docker. Log errors to file
+    ini_set("error_log", SYSTEM_PATH . DS . 'logs' . DS . 'php_errors.log');
+}
+ini_set("display_errors", "0");
+
+
 $timestamp = time();
 $authPIDAvcred = 0;
 
@@ -122,6 +147,7 @@ if ($web == 0) {
         } else {
             $temp = mysql_fetch_assoc($result1);
         }
+        error_log($query1);
         if ($temp['rnk'] > ($temp['unavl'] + $temp['unlc'])) {
             $temp['unavl'] = ($temp['rnk'] - $temp['unlc'] - $temp['unavl']) + $temp['unavl'];
             //$query9 = "UPDATE `stats_a` SET unavl='".$temp['unavl']."' WHERE pid='".$authPID."'";
@@ -586,15 +612,17 @@ $aparm2 = explode(" ", $parm2);
           LEFT JOIN `stats_w` w ON w.pid=p.pid
           WHERE p.pid='".$authPID."' LIMIT 1";
           $result1 = mysql_query($query1) or die(mysql_error());
+          error_log($query1);
           if (!mysql_num_rows($result1)) {
-          errorcode(104);
-          exit;
+            errorcode(104);
+            exit;
           } else {
-          $temp = mysql_fetch_assoc($result1);
+            $temp = mysql_fetch_assoc($result1);
           }
           if ($temp['rnk'] > ($temp['unavl']+$temp['unlc'])) {
           $temp['unavl'] = ($temp['rnk']-$temp['unlc']-$temp['unavl'])+$temp['unavl'];
-          $query9 = "UPDATE `stats_a` SET unavl='".$temp['unavl']."' WHERE pid='".$authPID."'";
+          //$query9 = "UPDATE `stats_a` SET unavl='".$temp['unavl']."' WHERE pid='".$authPID."'";
+          $query9 = "UPDATE `playerprogress` SET unavl='" . $temp['unavl'] . "' WHERE pid='" . $authPID . "'";
           $result9 = mysql_query($query9) or die(mysql_error());
           }
           $temp = preprecparam($temp);
@@ -606,13 +634,13 @@ $aparm2 = explode(" ", $parm2);
           $D =	"\nD";
 		 // print_r($temp);
           foreach($temp as $parm1=>$parm2) {
-          if ($parm1=="wins") $parm1 = "win";
-		  $H .= "\t".$parm1;
-          if(isset($parm2)) {
-          $D .= "\t".$parm2;
-          } else {
-          $D .= "\t0";
-          }
+            if ($parm1=="wins") $parm1 = "win";
+            $H .= "\t".$parm1;
+            if(isset($parm2)) {
+                $D .= "\t".$parm2;
+            } else {
+                $D .= "\t0";
+            }
           }
 
           $Out .= $H.$D;
@@ -636,7 +664,8 @@ $aparm2 = explode(" ", $parm2);
           }
           if ($temp['rnk'] > ($temp['unavl']+$temp['unlc'])) {
           $temp['unavl'] = ($temp['rnk']-$temp['unlc']-$temp['unavl'])+$temp['unavl'];
-          $query9 = "UPDATE `stats_a` SET unavl='".$temp['unavl']."' WHERE pid='".$authPID."'";
+          //$query9 = "UPDATE `stats_a` SET unavl='".$temp['unavl']."' WHERE pid='".$authPID."'";
+          $query9 = "UPDATE `playerprogress` SET unavl='" . $temp['unavl'] . "' WHERE pid='" . $authPID . "'";
           $result9 = mysql_query($query9) or die(mysql_error());
           }
           $temp = preprecparam($temp);

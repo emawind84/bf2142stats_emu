@@ -751,7 +751,7 @@ medal_data = (
 			#War College Ribbon
 			('308',	'Wcr', LIMIT_SINGLE, f_and(	player_score ('cmdPyScore', 45),
 								global_stat ('tac', 216000),
-								f_div (	global_stat ('win'), 
+								f_div (	global_stat ('wins'), 
     									global_stat ('los'), 2)), 2000),
 
 

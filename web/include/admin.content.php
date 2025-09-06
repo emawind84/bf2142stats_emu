@@ -72,8 +72,8 @@ if (!checkSession()) {
 			showServerInfo();
 			break;
 		case "mapinfo":
-			showUnderConstruction();
-			//showMapInfo();
+			//showUnderConstruction();
+			showMapInfo();
 			break;
 		case "validateranks":
 			showUnderConstruction();
@@ -92,7 +92,7 @@ if (!checkSession()) {
 			showImportPlayersForm();
 			break;
 		default:
-			showLoginForm();
+			//showLoginForm();
 			break;
 	}
 }

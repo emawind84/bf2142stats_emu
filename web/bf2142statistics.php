@@ -3,10 +3,35 @@ ob_start();
 
 
 
+/*
+| ---------------------------------------------------------------
+| Define Constants
+| ---------------------------------------------------------------
+*/
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__FILE__));
+define('SYSTEM_PATH', ROOT);
 
 
+/*
+| ---------------------------------------------------------------
+| Set Error Reporting and Zlib Compression
+| ---------------------------------------------------------------
+*/
+error_reporting(E_ALL);
+ini_set("log_errors", "1");
+if (!getenv('PHP_VERSION')) {
+    # Not running in docker. Log errors to file
+    ini_set("error_log", SYSTEM_PATH . DS . 'logs' . DS . 'php_errors.log');
+}
+ini_set("display_errors", "0");
 
+// Disable Zlib Compression
+ini_set('zlib.output_compression', '0');
 
+// Make Sure Script doesn't timeout even if the user disconnects!
+set_time_limit(300);
+ignore_user_abort(true);
 
 
 
@@ -28,17 +53,15 @@ function chz($val) {
 $allow_db_changes = true;
 $allow_db_show = true;
 
-//Disable Zlib Compression
-ini_set('zlib.output_compression', '0');
-
 //Make Sure Script doesn't timeout even if the user disconnects!
 set_time_limit(0);
 ignore_user_abort(true);
 
 // Import configuration
-require('include/utils.php');
-require_once('include/_ccconfig.php');
-require_once ('include/rankSettings.php');
+require_once(SYSTEM_PATH . DS . 'include/_ccconfig.php');
+require_once(SYSTEM_PATH . DS . 'include/rankSettings.php');
+require_once(SYSTEM_PATH . DS . 'include/utils.php');
+
 $cfg = new Config();
 DEFINE("_ERR_RESPONSE", "E\nH\tresponse\nD\t<font color=\"red\">ERROR</font>: ");
 
@@ -82,13 +105,14 @@ if (mysql_num_rows($result0)) {
 $rawdata = file_get_contents('php://input');
 //$rawdata = file_get_contents('data.txt');
 if ($LOG) {
-$fp = fopen("logs/rawdata".time().".txt","a+");
-fwrite($fp,$rawdata);
-fflush($fp);
-fclose($fp);
+    $fp = fopen("logs/rawdata_". uniqid() . '_' . mt_rand() .".txt", "a+");
+    fwrite($fp,$rawdata);
+    fflush($fp);
+    fclose($fp);
 }
 //$rawdata = file_get_contents('sinthetixData.txt');
-file_put_contents("sinthetixData.txt", $rawdata);
+//file_put_contents("sinthetixData.txt", $rawdata);
+
 // Seperate data
 if ($rawdata) {
     $gooddata = explode('\\', $rawdata);
@@ -111,10 +135,10 @@ for ($x = 2; $x < count($gooddata); $x += 2) {
 }
 //!print_r($data);
 if ($LOG) {
-$fp = fopen("logs/data".time().".txt","a+");
-fwrite($fp,print_r($data,true));
-fflush($fp);
-fclose($fp);
+    $fp = fopen("logs/data_". uniqid() . '_' . mt_rand() .".txt","a+");
+    fwrite($fp,print_r($data,true));
+    fflush($fp);
+    fclose($fp);
 }
 // Import Backend Awards Data
 require('include/data.awards.php');
@@ -137,13 +161,25 @@ if ($prefix != '') {
 if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != "") {
     $ip_s = $_SERVER['REMOTE_ADDR'];
 }
+
+// Build the full path to the stats file
+$statsDir = chkPath($cfg->get('stats_logs'));
 $stats_filename .= $mapdate . '_' . $mapname . $cfg->get('stats_ext');
+$fullPath = $statsDir . $stats_filename;
 
-//	$file = @fopen( chkPath($cfg->get('stats_logs')) . $stats_filename, 'wb');
-//	@fwrite($file, $rawdata);
-//	@fclose($file);
+// Check if the file doesn't exist before writing
+if (!file_exists($fullPath)) {
+    $file = @fopen($fullPath, 'wb');
+    if ($file) {
+        @fwrite($file, $rawdata);
+        @fclose($file);
+    } else {
+        ErrorLog("Failed to open file for writing: $fullPath", 3);
+    }
+}
 
-$errmsg = "SNAPSHOT Data Logged (" . chkPath($cfg->get('stats_logs')) . $stats_filename . ")";
+// Log success message
+$errmsg = "SNAPSHOT Data Logged ($fullPath)";
 ErrorLog($errmsg, 3);
 
 
@@ -425,7 +461,18 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 
                 if (!mysql_num_rows($result1)) {
                     ErrorLog("Player (" . $data["pid_$x"] . ") not found in `subaccount`.", 3);
-                    continue;
+
+                    $query1 = "INSERT INTO subaccount SET subaccount = '". $data["nick_$x"] ."'" .
+                            ", id = '" . $data["pid_$x"] . "'" .
+                            ", profileid = '" . $data["pid_$x"] . "';";
+                    $result1 = mysql_query($query1);
+                    checkSQLResult ($result1, $query1);
+                    ErrorLog(">>>>>>>>>>" . $query1 . "", 3);
+
+                    $query1 = "SELECT * FROM subaccount s " .
+                            " WHERE s.id=" . $data["pid_$x"];
+                    $result1 = mysql_query($query1);
+                    checkSQLResult($result1, $query1);
                 }
                 $data2 = mysql_fetch_assoc($result1);
 
@@ -1005,17 +1052,15 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                         $query = "UPDATE playerprogress SET " . rtrim($query3p, ",") . " WHERE `pid`='" . $data["pid_$x"] . "'";
                     }
                     $res = mysql_query($query);
-			if (!$res) {
-if ($LOG) {
-$fp = fopen("logs/error".time().".txt","a+");
-fwrite($fp,$query."
-".mysql_error());
-fflush($fp);
-fclose($fp);
-}
-}
-
-
+                    if (!$res) {
+                        if ($LOG) {
+                            $fp = fopen("logs/error".time().".txt","a+");
+                            fwrite($fp,$query."
+                            ".mysql_error());
+                            fflush($fp);
+                            fclose($fp);
+                        }
+                    }
                 }
 
                 if ($query3a) {
@@ -1388,33 +1433,35 @@ fclose($fp);
      * Process 'Archive Data File'
      * ****************************** */
     if ($cfg->get('stats_move_logs')) {
-        if (file_exists(chkPath($cfg->get('stats_logs_store')) . $ip_s)) {
-            
-        } else {
-            mkdir(chkPath($cfg->get('stats_logs_store')) . $ip_s, 0777);
+        $storePath = chkPath($cfg->get('stats_logs_store'));
+        $logDir = chkPath($cfg->get('stats_logs'));
+        $targetDir = $storePath . $ip_s;
+    
+        // Ensure target directory exists
+        if (!is_dir($targetDir)) {
+            if (!mkdir($targetDir, 0777, true)) {
+                ErrorLog("Failed to create directory: {$targetDir}", 1);
+                return;
+            }
         }
-
-        $fn_src = chkPath($cfg->get('stats_logs')) . $stats_filename;
-        $fn_dest = chkPath($cfg->get('stats_logs_store')) . $ip_s . '/' . $stats_filename;
-
+    
+        $fn_src = $logDir . $stats_filename;
+        $fn_dest = $targetDir . '/' . $stats_filename;
+    
         if (file_exists($fn_src)) {
             if (file_exists($fn_dest)) {
-                $errmsg = "SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})";
-                ErrorLog($errmsg, 2);
+                ErrorLog("SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})", 2);
             }
-            copy($fn_src, $fn_dest);
-
-            // Remove the original ONLY if it copies
-            if (file_exists($fn_dest)) {
+    
+            if (copy($fn_src, $fn_dest)) {
                 unlink($fn_src);
+                ErrorLog("SNAPSHOT Data File Moved! ({$fn_src} -> {$fn_dest})", 3);
+            } else {
+                ErrorLog("Failed to copy file: {$fn_src} -> {$fn_dest}", 1);
             }
         }
-
-        $errmsg = "SNAPSHOT Data File Moved! ({$fn_src} -> {$fn_dest})";
-        ErrorLog($errmsg, 3);
     }
-    $errmsg = "SNAPSHOT Data File Processed: {$stats_filename}";
-    ErrorLog($errmsg, -1);
+    ErrorLog("SNAPSHOT Data File Processed: {$stats_filename}", -1);
 }
 
 // Close database connection

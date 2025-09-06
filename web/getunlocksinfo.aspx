@@ -57,11 +57,11 @@ if (!mysql_num_rows($result1) AND $game_unlocks != 1) {
 
 if ($game_unlocks == 0) {
 	$Out = "O
-H\tpid\tnick\tasof
-D\t".$authPID."\t".$authPIDNick."\t".$timestamp."
-H\tAvcred
-D\t".$authPIDAvcred."
-H\tUnlockID";
+H\tpid\tnick\tasof\t
+D\t".$authPID."\t".$authPIDNick."\t".$timestamp."\t
+H\tAvcred\t
+D\t".$authPIDAvcred."\t
+H\tUnlockID\t";
 	$query2 = "SELECT * FROM `unlocks` WHERE pid='".$authPID."'";
 	$result2 = mysql_query($query2) or die(mysql_error());
 	if (mysql_num_rows($result2)) {
@@ -71,29 +71,29 @@ H\tUnlockID";
 	}
 } elseif ($game_unlocks == 1){
 	$Out = "O
-H\tpid\tnick\tasof
-D\t".$authPID."\t".$authPIDNick."\t".$timestamp."
-H\tAvcred
-D\t0
-H\tUnlockID";
+H\tpid\tnick\tasof\t
+D\t".$authPID."\t".$authPIDNick."\t".$timestamp."\t
+H\tAvcred\t
+D\t0\t
+H\tUnlockID\t";
 	$Out .= "
-D\t115
-D\t125
-D\t215
-D\t225
-D\t315
-D\t325
-D\t415
-D\t425
-D\t516
-D\t524";
+D\t115\t
+D\t125\t
+D\t215\t
+D\t225\t
+D\t315\t
+D\t325\t
+D\t415\t
+D\t425\t
+D\t516\t
+D\t524\t";
 } else {
 	$Out = "O
-H\tpid\tnick\tasof
-D\t".$authPID."\t".$authPIDNick."\t".$timestamp."
-H\tAvcred
-D\t".$authPIDAvcred."
-H\tUnlockID";
+H\tpid\tnick\tasof\t
+D\t".$authPID."\t".$authPIDNick."\t".$timestamp."\t
+H\tAvcred\t
+D\t".$authPIDAvcred."\t
+H\tUnlockID\t";
 	
 }
 $countOut = preg_replace('/[\t\n]/','',$Out);
