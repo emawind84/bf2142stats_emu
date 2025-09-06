@@ -147,7 +147,6 @@ if ($web == 0) {
         } else {
             $temp = mysql_fetch_assoc($result1);
         }
-        error_log($query1);
         if ($temp['rnk'] > ($temp['unavl'] + $temp['unlc'])) {
             $temp['unavl'] = ($temp['rnk'] - $temp['unlc'] - $temp['unavl']) + $temp['unavl'];
             //$query9 = "UPDATE `stats_a` SET unavl='".$temp['unavl']."' WHERE pid='".$authPID."'";
@@ -612,7 +611,6 @@ $aparm2 = explode(" ", $parm2);
           LEFT JOIN `stats_w` w ON w.pid=p.pid
           WHERE p.pid='".$authPID."' LIMIT 1";
           $result1 = mysql_query($query1) or die(mysql_error());
-          error_log($query1);
           if (!mysql_num_rows($result1)) {
             errorcode(104);
             exit;
