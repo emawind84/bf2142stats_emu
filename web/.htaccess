@@ -1,2 +1,43 @@
 AddType application/x-httpd-php .aspx
 IndexIgnore *
+
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks
+
+    # Enable Rewrite Engine
+    RewriteEngine On
+
+    # Tell PHP that the mod_rewrite module is ENABLED.
+    SetEnv HTTP_MOD_REWRITE On
+
+    # We don't want to pass calls to css, script, and image files to the index,
+    # whether they exist or not. So quit right here, and allow direct access
+    # to common format files. Add formats here to allow direct link access
+    RewriteRule ^.*\.(gif|png|jpe?g|bmp|css|js|swf|wav|avi|mpg|ttf|woff)$ - [NC,L]
+
+    # Deny access to the aspx, frontend and system folders. All defined
+    # file extensions from the previous rewrite rule wont make it here, which allows
+    # direct access to images and such in these folders still.
+    RewriteRule ^include/ - [R=403,L,NC]
+    RewriteRule ^admin/ - [R=403,L,NC]
+    RewriteRule ^logs/ - [R=403,L,NC]
+    RewriteRule ^py/ - [R=403,L,NC]
+	RewriteRule ^nbproject/ - [R=403,L,NC]
+	RewriteRule ^.*\.(txt)$ - [R=403,L,NC]
+
+    # Don't redirect direct links to non-existent files or directories to the index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Don't redirect direct links to non-existent files or directories to the index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Don't redirect direct links to non-existent files or directories to the index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+</IfModule>
+<IfModule !mod_rewrite.c>
+    # Tell PHP that the mod_rewrite module is DISABLED.
+    SetEnv HTTP_MOD_REWRITE Off
+</IfModule>
