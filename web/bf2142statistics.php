@@ -632,7 +632,25 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 //pdt	Unique Dog Tags Collected
                 //pdtc	Dog Tags Collected
                 if (isset($data["pdt_$x"])) {
-                    $query3p .= " `pdt`='" . $data["pdt_$x"] . "',";
+                    ErrorLog("Processing Dog Tags", 3);
+                    // TODO add dogtag into new table
+                    $tmpdata = json_decode(quote_keys($data["pdt_$x"]), true); // true = associative array
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        ErrorLog('Invalid JSON: ' . json_last_error_msg(), 3);
+                    }
+                    foreach ($tmpdata as $key => $value) {
+                        ErrorLog(">>>>>>>>>> Key: " . $key . ", Value: " . $value, 3);
+                        $query = "INSERT INTO dogtag_events SET " . 
+                            "`killer_id`='" . $data["pid_$x"] . "'," .
+                            "`victim_id`='" . $data["pid_" . $key] . "'," .
+                            "`cnt`={$value}," .
+                            "`gm`='" . $data["gm"] . "'," .
+                            "`mapid`='" . $mapid . "'";
+                        ErrorLog(">> {$query}", 3);
+                        $res = mysql_query($query);
+                        checkSQLResult($res, $query);
+                    }
+                    // $query3p .= " `pdt`='" . $data["pdt_$x"] . "',";
                 }
                 if (isset($data["pdtc_$x"]) AND $data["pdtc_$x"] > 0) {
                     $query3p .= " `pdtc`=(`pdtc`+" . $data["pdtc_$x"] . "),";
@@ -1052,15 +1070,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                         $query = "UPDATE playerprogress SET " . rtrim($query3p, ",") . " WHERE `pid`='" . $data["pid_$x"] . "'";
                     }
                     $res = mysql_query($query);
-                    if (!$res) {
-                        if ($LOG) {
-                            $fp = fopen("logs/error".time().".txt","a+");
-                            fwrite($fp,$query."
-                            ".mysql_error());
-                            fflush($fp);
-                            fclose($fp);
-                        }
-                    }
+                    checkSQLResult($res, $query);
                 }
 
                 if ($query3a) {

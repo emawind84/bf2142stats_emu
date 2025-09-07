@@ -124,6 +124,11 @@ if (hexdec($code[26] . $code[27] . $code[24] . $code[25]) == 1) {
     $isServer = false;
 }
 
+if (isset($_GET["dogTagFilter"]) AND $_GET["dogTagFilter"] == "1") {
+    $where_1 = " WHERE t.pid in (select victim_id from dogtag_events where killer_id = '" . $authPID . "')";
+    $where_2 = " AND p.pid in (select victim_id from dogtag_events where killer_id = '" . $authPID . "')";
+}
+
 $connection = @mysql_connect($db_host, $db_user, $db_pass);
 
 @mysql_select_db($db_name);
@@ -244,8 +249,8 @@ exit;
 
     $query2 = "SELECT count(*) FROM `subaccount` s
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		LEFT JOIN `stats_a` a ON a.pid=s.id
-		WHERE a.gsco >= 0" . $where_2;
+		LEFT JOIN `playerprogress` p ON p.pid=s.id
+		WHERE p.gsco >= 0" . $where_2;
     $result2 = mysql_query($query2) or die(mysql_error());
     if (!mysql_num_rows($result2)) {
         errorcode(1042);
@@ -273,7 +278,6 @@ FROM
 		( SELECT * FROM stats_a where pid=" . $authPID . " ORDER BY klls DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
@@ -355,7 +359,6 @@ FROM
 		( SELECT * FROM playerprogress where pid=" . $authPID . " ORDER BY gsco DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
@@ -420,7 +423,6 @@ FROM
 		( SELECT * FROM playerprogress where pid=" . $authPID . " ORDER BY cs DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
@@ -487,7 +489,6 @@ FROM
 		( SELECT * FROM playerprogress where pid=" . $authPID . " ORDER BY klls DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
@@ -553,7 +554,6 @@ FROM
 		( SELECT * FROM playerprogress where pid=" . $authPID . " ORDER BY klls DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
@@ -619,7 +619,6 @@ FROM
 		( SELECT * FROM playerprogress where pid=" . $authPID . " ORDER BY cs DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
@@ -687,7 +686,6 @@ FROM
 		( SELECT * FROM playerprogress where pid=" . $authPID . " ORDER BY spm DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
@@ -755,16 +753,15 @@ FROM
 		LEFT JOIN `subaccount` s ON s.id=w.pid 
 		LEFT JOIN `playerprogress` p ON p.pid=w.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
 		FROM 
-			( SELECT 2 as tt, p.nick, c.countryCode, p.pid, p.rnk, w.`wkls-".$id."`, w.`wdths-".$id."`, w.`waccu-".$id."`, w.`wkdr-".$id."`, (SELECT COUNT(*)+1 FROM `stats_w` ww WHERE ww.`wkls-".$id."` > w.`wkls-".$id."`) AS pos, 0 AS Vet
+			( SELECT 2 as tt, t.nick, c.countryCode, t.pid, t.rnk, w.`wkls-".$id."`, w.`wdths-".$id."`, w.`waccu-".$id."`, w.`wkdr-".$id."`, (SELECT COUNT(*)+1 FROM `stats_w` ww WHERE ww.`wkls-".$id."` > w.`wkls-".$id."`) AS pos, 0 AS Vet
 				FROM
 					(SELECT * FROM `stats_w` ORDER BY `wkls-".$id."` DESC) w
 					LEFT JOIN `subaccount` s ON s.id=w.pid 
-                                        LEFT JOIN `playerprogress` p ON p.pid=w.pid 
+                    LEFT JOIN `playerprogress` t ON t.pid=w.pid 
 					LEFT JOIN `account` c ON c.profileid=s.profileid
 					" . $where_1 . "
 				LIMIT " . ($getpos - 1) . "," . $getafter . "
@@ -837,16 +834,15 @@ FROM
 		LEFT JOIN `subaccount` s ON s.id=v.pid 
 		LEFT JOIN `playerprogress` p ON p.pid=v.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*
 		FROM 
-			( SELECT 2 as tt, p.nick, c.countryCode, p.pid, p.rnk, v.`vkls-".$id."`, v.`vdths-".$id."`, v.`vrkls-".$id."`, (SELECT COUNT(*)+1 FROM `stats_v` vv WHERE vv.`vkls-".$id."` > v.`vkls-".$id."`) AS pos, 0 AS Vet
+			( SELECT 2 as tt, t.nick, c.countryCode, t.pid, t.rnk, v.`vkls-".$id."`, v.`vdths-".$id."`, v.`vrkls-".$id."`, (SELECT COUNT(*)+1 FROM `stats_v` vv WHERE vv.`vkls-".$id."` > v.`vkls-".$id."`) AS pos, 0 AS Vet
 				FROM
 					(SELECT * FROM `stats_v` ORDER BY `vkls-".$id."` DESC) v
 					LEFT JOIN `subaccount` s ON s.id=v.pid 
-                                        LEFT JOIN `playerprogress` p ON p.pid=v.pid 
+                    LEFT JOIN `playerprogress` t ON t.pid=v.pid 
 					LEFT JOIN `account` c ON c.profileid=s.profileid
 					" . $where_1 . "
 				LIMIT " . ($getpos - 1) . "," . $getafter . "
@@ -876,8 +872,8 @@ D\t" . $row['rnk'] . "\t" . $row['pos'] . "\t" . $row['pid'] . "\t" . rawurldeco
 } elseif (!$isServer) {
     $query2 = "SELECT count(*) FROM `subaccount` s
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		LEFT JOIN `stats_a` a ON a.pid=s.id
-		WHERE a.gsco >= 0" . $where_2;
+		LEFT JOIN `playerprogress` p ON p.pid=s.id
+		WHERE p.gsco >= 0" . $where_2;
     $result2 = mysql_query($query2) or die(mysql_error());
     if (!mysql_num_rows($result2)) {
         errorcode(1042);
@@ -900,7 +896,6 @@ FROM
 		( SELECT * FROM playerprogress p where pid=" . $authPID . " ORDER BY gsco DESC ) t
 		LEFT JOIN `subaccount` s ON s.id=t.pid 
 		LEFT JOIN `account` c ON c.profileid=s.profileid
-		" . $where_1 . "
 	UNION
 		SELECT
 			r.*

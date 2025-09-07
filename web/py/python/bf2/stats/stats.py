@@ -713,6 +713,7 @@ def onPlayerKilled(victim, attacker, weapon, assists, object):
 							attacker.stats.dogTags[victim.stats.connectionOrderNr] = 0
 						
 						attacker.stats.dogTags[victim.stats.connectionOrderNr] += 1
+						attacker.stats.dogtagCount += 1
 						bf2.gameLogic.sendGameEvent(attacker, 19, victim.index) #19 = GLDogTag
 					
 				if victim != None:

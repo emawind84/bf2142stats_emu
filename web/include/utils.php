@@ -352,4 +352,8 @@ function mySort($arr, $dir) {
     }
 }
 
+function quote_keys($json_like) {
+    return preg_replace('/(\{|,)\s*(\d+)\s*:/', '$1 "$2":', $json_like);
+}
+
 ?>

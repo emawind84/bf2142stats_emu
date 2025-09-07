@@ -1023,3 +1023,21 @@ CREATE TABLE IF NOT EXISTS `_version` (
   PRIMARY KEY (`dbver`),
   KEY `dbver` (`dbver`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE IF NOT EXISTS `dogtag_events` (
+  `id` int(11) NOT NULL,
+  `killer_id` int(10) UNSIGNED NOT NULL,
+  `victim_id` int(10) UNSIGNED NOT NULL,
+  `cnt` int(10)  UNSIGNED NOT NULL,
+  `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `gm` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'game mode',
+  `mapid` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'map id'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `dogtag_events`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `killer_id` (`killer_id`,`victim_id`,`timestamp`,`mapid`);
+
+ALTER TABLE `dogtag_events`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
