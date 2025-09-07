@@ -9,115 +9,147 @@ CRLF = "\r\n"
 def http_get(host, port = 80, document = "/"):
 
 	try:
-		http = miniclient(host,	port)
+		http = miniclient(host, port)
 
 	except Exception, e:
 
-		if e[0]	== 111:
-			print	"MiniClient[17]: Connection refused by server %s on port %d" % (host,port)
+		if e[0] == 111:
+			print	"Connection refused by server %s on port %d" % (host,port)
 
 		raise
 
-	http.writeline("GET %s HTTP/1.1" % str(document))
-	http.writeline("HOST: %s" % host)
-	http.writeline("User-Agent: GameSpyHTTP/1.0")
-	http.writeline("Connection: close") # do not keep-alive
-	http.writeline("")
-	http.shutdown() # be nice, tell the http server we're done sending the request
-	
-	# Determine Status
-	status = string.split(http.readline())
-	if status[0] != "HTTP/1.1":
-		print "MiniClient[31]: Unknown status response (%s)" % str(status[0])
-	
 	try:
-		status = string.atoi(status[1])
-	except ValueError:
-		print "MiniClient[36]: Non-numeric status code (%s)" % str(status[1])
-	
-	#Extract Headers
-	headers = []
-	while 1:
-		line = http.readline()
-		if not line:
-			break
-		headers.append(line)
-	
-	http.close() # all done
+		http.writeline("GET %s HTTP/1.1" % str(document))
+		http.writeline("Host: %s" % host)
+		http.writeline("User-Agent: GameSpyHTTP/1.0")
+		http.writeline("Connection: close") # do not keep-alive
+		http.writeline("")
 
-	#Check we got a valid HTTP response
-	if status == 200:
-		return http.read()
-	else:
-		return "E\nH\terr\nD\tHTTP Error\n$\tERR\t$"
-	
+		# Determine Status
+		statusCode = 0
+		status = string.split(http.readline())
+		if status[0] != "HTTP/1.1":
+			print "MiniClient: Unknown status response (%s)" % str(status[0])
+		
+		try:
+			statusCode = string.atoi(status[1])
+		except ValueError:
+			print "MiniClient: Non-numeric status code (%s)" % str(status[1])
+		
+		#Extract Headers
+		headers = {}
+		while 1:
+			line = http.readline()
+			if not line:
+				break
+			split = line.split(":")
+			headers[split[0].strip()] = split[1].strip()
+		
+		#Check we got a valid HTTP response
+		if statusCode == 200:
+			body = ""
+			if "Content-Length" in headers:
+				content_length = headers["Content-Length"]
+				body = http.read()
+			elif "Transfer-Encoding" in headers and headers["Transfer-Encoding"] == "chunked":
+				while 1:
+					chunk_length = int(http.readline(), 16)
+					if chunk_length != 0:
+						body += http.read(chunk_length)
+					http.readline() # CRLF
+					if chunk_length == 0:
+						break
+			else:
+				# No Content-Length nor Transfer-Encoding header. Read until EOF
+				body = http.read()
+
+			http.shutdown() # be nice, tell the http server we're done sending the request
+			http.close() # all done
+			return body
+		else:
+			http.shutdown() # be nice, tell the http server we're done sending the request
+			http.close() # all done
+			return "E\nH\terr\nD\tHTTP Error %s \"%s\"\n$\tERR\t$" % (str(statusCode), str(status[2]))
+		
+	except Exception, e:
+		http.shutdown() # be nice, tell the http server we're done sending the request
+		http.close() # all done
+		raise
+		
 
 
 def http_postSnapshot(host, port = 80, document = "/", snapshot = ""):
-	#print "MiniClient[57]: %s:%s/%s \n %s" % (str(host),str(port),str(document),str(snapshot),)
+
 	try:
 		http = miniclient(host, port)
 
 	except Exception, e:
 
 		if e[0]	== 111:
-			print	"MiniClient[64]: Connection refused by server %s on port %d" % (host,port)
+			print	"Connection refused by server %s on port %d" % (host,port)
 		
 		raise
 
 	try:
-		print "POST %s HTTP/1.1\n" % str(document)
 		http.writeline("POST %s HTTP/1.1" % str(document))
-		print "HOST: %s\n" % str(host)
 		http.writeline("HOST: %s" % str(host))
-		print "User-Agent: GameSpyHTTP/1.0\n"
 		http.writeline("User-Agent: GameSpyHTTP/1.0")
-		print "Content-Type: application/x-www-form-urlencoded\n"
 		http.writeline("Content-Type: application/x-www-form-urlencoded")
-		print "Content-Length: %s\n" % str(len(snapshot))
 		http.writeline("Content-Length: %s" % str(len(snapshot)))
-		print "Connection: close\n"
 		http.writeline("Connection: close")
-		print "\n"
 		http.writeline("")
-		print str(snapshot)
 		http.writeline(str(snapshot))
-		print "\n"
 		http.writeline("")
-		print "-----"
-		http.shutdown() # be nice, tell the http server we're done sending the request
 
 		# Check that SnapShot Arrives.
 		# Determine Status
+		statusCode = 0
 		status = string.split(http.readline())
 		if status[0] != "HTTP/1.1":
-			print "MiniClient[84]: Unknown status response (%s)" % str(status)
+			print "MiniClient: Unknown status response (%s)" % str(status[0])
 		
 		try:
-			status = string.atoi(status[1])
+			statusCode = string.atoi(status[1])
 		except ValueError:
-			print "MiniClient[89]: Non-numeric status code (%s)" % str(status[1])
+			print "MiniClient: Non-numeric status code (%s)" % str(status[1])
 		
 		#Extract Headers
-		headers = []
+		headers = {}
 		while 1:
 			line = http.readline()
 			if not line:
 				break
-			headers.append(line)
-			
-		http.close() # all done
-		
-		if status == 200:
-			print "MiniClient[102] SNAPSHOT Received: OK"
-			returnCode = 1
+			split = line.split(":")
+			headers[split[0].strip()] = split[1].strip()
+
+		if statusCode == 200:
+			body = ""
+			if "Content-Length" in headers:
+				content_length = headers["Content-Length"]
+				body = http.read()
+			elif "Transfer-Encoding" in headers and headers["Transfer-Encoding"] == "chunked":
+				while 1:
+					chunk_length = int(http.readline(), 16)
+					if chunk_length != 0:
+						body += http.read(chunk_length)
+					http.readline() # CRLF
+					if chunk_length == 0:
+						break
+			else:
+				# No Content-Length nor Transfer-Encoding header. Read until EOF
+				body = http.read()
+
+			http.shutdown() # be nice, tell the http server we're done sending the request
+			http.close() # all done
+			return body
 		else:
-			print "MiniClient[105] SNAPSHOT Received: ERROR"
-			returnCode = 0
-		
-		return status
+			http.shutdown() # be nice, tell the http server we're done sending the request
+			http.close() # all done
+			return "E\nH\terr\nD\tHTTP Error %s \"%s\"\n$\tERR\t$" % (str(statusCode), str(status[2]))
 
 	except Exception, e:
+		http.shutdown() # be nice, tell the http server we're done sending the request
+		http.close() # all done
 		raise
 
 class miniclient:

@@ -1,7 +1,9 @@
 import host
 import sys
 
+from time import localtime, strftime
 from bf2.Timer import Timer
+from BF2142StatisticsConfig import debug_enable, debug_log_path
 
 class GameStatus:
 	Playing = 1
@@ -18,7 +20,7 @@ gameLogic = None
 serverSettings = None
 gameServer = None
 
-g_debug = 1
+g_debug = debug_enable
 
 
 # set up singletons
@@ -74,9 +76,28 @@ def init_module():
 	sys.stdout = fake_stream('stdout')
 	sys.stderr = fake_stream('stderr')
 
-	log = file('bf2python.log', 'w')
+	# omero, 2005-11-19
+	# comment out the above lines and
+	# uncomment the following for python looging to gui
+	# ---------------------------------------------------
+	# NOTE 1: Requires that gui_log.pyw is present in
+	#         <gameserver installation path>/python/bf2
+	#
+	# NOTE 2: gui_log.pyw MUST be started
+	#         BEFORE gameserver
+	# ---------------------------------------------------
+	#import gui_log
+	
+	
+	# Added by Chump - for bf2statistics stats
+	logtime = str(strftime("%Y%m%d", localtime()))
+	log = file(debug_log_path + '/bf2game_' + logtime + '.log', 'a')
 	sys.stdout = log
 	sys.stderr = log
+	
+	print "=============================================="
+	print " BF2142 Logging Started: %s" % str(strftime("%x %X", localtime()))
+	print "=============================================="
 
 	import game.scoringCommon
 	game.scoringCommon.init()
@@ -84,66 +105,51 @@ def init_module():
 	try:
 		import bf2.stats.stats
 	except ImportError:
-		print "__init__[87]: Official stats module not found."
+		print "Official stats module not found."
 	else:
-		print "__init__[89]: Official stats module found."
 		bf2.stats.stats.init()
 
 	try:
 		import bf2.stats.endofround
 	except ImportError:
-		print "__init__[95]: Endofround module not found."
+		print "Endofround module not found."
 	else:
-		print "__init__[97]: Endofround module found."
 		bf2.stats.endofround.init()
 
+# Added by Chump - for bf2statistics stats (and de-indenting)
+	#if not gameLogic.isAIGame():
+	try:
+		import bf2.stats.snapshot
+	except ImportError:
+		print "Snapshot module not found."
+	else:
+		bf2.stats.snapshot.init()
 
-	if not gameLogic.isAIGame():
-	
-		try:
-			import bf2.stats.snapshot
-		except ImportError:
-			print "__init__[106]: Snapshot module not found. %s" % ImportError
-		else:
-			print "__init__[108]: Snapshot module found."
-			bf2.stats.snapshot.init()
-		
-		try:
-			import bf2.stats.medals
-		except ImportError:
-			print "__init__[114]: Medal awarding module not found."
-		else:
-			print "__init__[116]: Medal awarding module found."
-			bf2.stats.medals.init()
-	
-		try:
-			import bf2.stats.rank
-		except ImportError:
-			print "__init__[122]: Rank awarding module not found."
-		else:
-			print "__init__[124]: Rank awarding module found."
-			bf2.stats.rank.init()
-		
+	try:
+		import bf2.stats.medals
+	except ImportError:
+		print "Medal awarding module not found."
+	else:
+		bf2.stats.medals.init()
+
+	try:
+		import bf2.stats.rank
+	except ImportError:
+		print "Rank awarding module not found."
+	else:
+		bf2.stats.rank.init()
+
 	try:
 		import bf2.stats.unlocks
 	except ImportError:
-		print "__init__[130]: Unlock awarding module not found."
+		print "Unlock awarding module not found."
 	else:
-		print "__init__[132]: Unlock awarding module found."
 		bf2.stats.unlocks.init()
 		
 	try:
 		import bf2.stats.fragalyzer_log
 	except ImportError:
-		print "__init__[138]: Fragalyzer log module not found."
+		print "Fragalyzer log module not found."
 	else:
-		print "__init__[140]: Fragalyzer log module found."
 		bf2.stats.fragalyzer_log.init()
 	
-#	try:
-#		import bf2.stats.test
-#	except ImportError:
-#		print "__init__[146]: test module not found."
-#	else:
-#		print "__init__[148]: test module found."
-#		bf2.stats.test.init()

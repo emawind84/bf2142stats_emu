@@ -9,7 +9,7 @@ from bf2.stats.medals import getMedalMap, setMedalMap
 # ------------------------------------------------------------------------------
 # omero 2006-03-31
 # ------------------------------------------------------------------------------
-from bf2.BF2142StatisticsConfig import http_backend_addr, http_backend_port, http_backend_asp, snapshot_prefix
+from bf2.BF2142StatisticsConfig import snapshot_logging, snapshot_log_path_sent, snapshot_log_path_unsent, http_backend_addr, http_backend_port, http_backend_asp, snapshot_prefix
 from bf2.stats.miniclient import miniclient, http_postSnapshot
 
 IGNORED_VEHICLES = [ VEHICLE_TYPE_ANTI_AIR, VEHICLE_TYPE_GDEF, VEHICLE_TYPE_PARACHUTE, VEHICLE_TYPE_SOLDIER ]
@@ -19,12 +19,16 @@ SPECIAL_VEHICLE = { VEHICLE_TYPE_TITAN_AA : VEHICLE_TYPE_TITAN, VEHICLE_TYPE_TIT
 ARMOR_VEHICLE = [ VEHICLE_TYPE_APC, VEHICLE_TYPE_TANK ]
 
 # Added by Chump - for bf2statistics stats
-from time import time
+from time import time, localtime, strftime
+
+# omero, 2006-03-31
+# the following is no longer necessary
+#import socket
 
 map_start = 0
 
 def init():
-	if g_debug: print "snapshot.py[53]: Snapshot module initialized"
+	if g_debug: print "Snapshot module initialized"
 	host.registerGameStatusHandler(onChangeGameStatus)
 
 def onChangeGameStatus(status):
@@ -34,19 +38,74 @@ def onChangeGameStatus(status):
 
 def invoke():
 
-	# Added by Chump - for bf2statistics stats
+# Added by Chump - for bf2statistics stats
 	#host.pers_gamespyStatsNewGame()
+	
 	snapshot_start = host.timer_getWallTime()
-	if g_debug: print "snapshot.py[64]: Gathering SNAPSHOT Data"
+	
+	if g_debug: print "Gathering SNAPSHOT Data"
 	snapShot = getSnapShot()
-	# Print in log
-	print snapShot
+
 	# Send snapshot to Backend Server
-	print "snapshot.py: Sending SNAPSHOT to backend: %s" % str(http_backend_addr)
+	print "Sending SNAPSHOT to backend: %s" % str(http_backend_addr)
+	SNAP_SEND = 0
+
+	
+	# -------------------------------------------------------------------
+	# Attempt to send snapshot
+	# -------------------------------------------------------------------
 	try:
 		backend_response = http_postSnapshot( http_backend_addr, http_backend_port, http_backend_asp, snapShot )
+		if backend_response and backend_response[0] == 'O':
+			print "SNAPSHOT Received: OK"
+			SNAP_SEND = 1
+			
+		else:
+			print "SNAPSHOT Received: ERROR"
+			if backend_response and backend_response[0] == 'E':
+				datalines = backend_response.splitlines()
+				print "Backend Response: %s" % str(datalines[2])
+				
+			SNAP_SEND = 0
+		
 	except Exception, e:
-		print "snapshot.py: An error occurred while sending SNAPSHOT to backend: %s" % str(e)
+		SNAP_SEND = 0
+		print "An error occurred while sending SNAPSHOT to backend: %s" % str(e)
+		
+	
+	# -------------------------------------------------------------------
+	# If SNAPSHOT logging is enabled, or the snapshot failed to send, 
+	# then log the snapshot
+	# -------------------------------------------------------------------	
+	if SNAP_SEND == 0:
+		log_time = str(strftime("%Y%m%d_%H%M", localtime()))
+		snaplog_title = snapshot_log_path_unsent + "/" + snapshot_prefix + "-" + bf2.gameLogic.getMapName() + "_" + log_time + ".txt"
+		print "Logging snapshot for manual processing..."
+		print "SNAPSHOT log file: %s" % snaplog_title
+		
+		try:
+			snap_log = file(snaplog_title, 'a')
+			snap_log.write(snapShot)
+			snap_log.close()
+		
+		except Exception, e:
+			print "Cannot write to SNAPSHOT log file! Reason: %s" % str(e)
+			print "Printing Snapshot as last resort manual processing: ", snapShot
+			
+	elif SNAP_SEND == 1 and snapshot_logging == 1:
+		log_time = str(strftime("%Y%m%d_%H%M", localtime()))
+		snaplog_title = snapshot_log_path_sent + "/" + snapshot_prefix + "-" + bf2.gameLogic.getMapName() + "_" + log_time + ".txt"
+		print "SNAPSHOT log file: %s" % snaplog_title
+		
+		try:
+			snap_log = file(snaplog_title, 'a')
+			snap_log.write(snapShot)
+			snap_log.close()
+		
+		except Exception, e:
+			print "Cannot write to SNAPSHOT log file! Reason: %s" % str(e)
+			print "Printing Snapshot as last resort manual processing: ", snapShot
+
 	print "SNAPSHOT Processing Time: %d" % (host.timer_getWallTime() - snapshot_start)
 
 ## ------------------------------------------------------------------------------
@@ -130,7 +189,7 @@ def getSnapShot():
 	running_mod = str(host.sgl_getModDirectory())
 	if ( running_mod.lower() == 'mods/bf2142' ):
 		v_value = 'bf2142'
-	elif ( running_mod.lower() == 'mods/BF2142S.P.EX' ):
+	elif ( running_mod.lower() == 'mods/bf2142s.p.ex' ):
 		v_value = 'bf2142spex'
 	else:
 		v_value = 'bf2142'
