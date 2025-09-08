@@ -1,60 +1,7 @@
 <?php
 
 DEFINE('_CODE_VER', '1.10.1');
-define('CONFIG_FILE', SYSTEM_PATH . DS . 'include/_ccconfig.php');
-
-/*
-  This script checks a remote IP address against a list of authorised hosts/subnets
-  Source: http://www.php.net/
-
-  Notes:
-  Host address and subnets are supported, use x.x.x.x/y standard notation.
-  Addresses without subnet (ie, x.x.x.x) are assumed to be a single HOST
-  An address of 0.0.0.0/0 matches ALL HOSTS (ie, disbales check)
-
-  $auth_hosts = array(
-  "127.0.0.1",
-  "10.0.0.0/8",
-  "172.16.0.0/12",
-  "192.168.0.0/16"
-  );
- */
-
-function isIPInNet($ip, $net, $mask) {
-    $lnet = ip2long($net);
-    $lip = ip2long($ip);
-    $binnet = str_pad(decbin($lnet), 32, 0, STR_PAD_LEFT);
-    $firstpart = substr($binnet, 0, $mask);
-    $binip = str_pad(decbin($lip), 32, 0, STR_PAD_LEFT);
-    $firstip = substr($binip, 0, $mask);
-
-    return(strcmp($firstpart, $firstip) == 0);
-}
-
-//This function check if a ip is in an array of nets (ip and mask)
-function isIpInNetArray($theip, $thearray) {
-    $exit_c = false;
-
-    if (is_array($thearray)) {
-        foreach ($thearray as $subnet) {
-            if ($subnet == '0.0.0.0' || $subnet == '0.0.0.0/0') { // Match All
-                $exit_c = true;
-                break;
-            }
-
-            if (strpos($subnet, "/") === false) {
-                $subnet .= "/32";
-            }
-
-            list($net, $mask) = explode("/", $subnet);
-            if (isIPInNet($theip, $net, $mask)) {
-                $exit_c = true;
-                break;
-            }
-        }
-    }
-    return($exit_c);
-}
+define('CONFIG_FILE', ROOT . DS . 'include' . DS . '_ccconfig.php');
 
 //We check each ip in the array and return response
 function checkIpAuth($chkhosts) {
@@ -68,22 +15,6 @@ function checkIpAuth($chkhosts) {
         return 1; // Authorised HOST IP
     } else {
         return 0; // UnAuthorised HOST IP
-    }
-}
-
-// Check Private IP
-function checkPrivateIp($ip_s) {
-    // Define Private IPs
-    $privateIPs = array();
-    $privateIPs[] = '10.0.0.0/8';
-    $privateIPs[] = '127.0.0.0/8';
-    $privateIPs[] = '172.16.0.0/12';
-    $privateIPs[] = '192.168.0.0/16';
-
-    if ($ip_s != "" AND isIPInNetArray($ip_s, $privateIPs)) {
-        return 1; // Private IP
-    } else {
-        return 0; // Public/Other IP
     }
 }
 
@@ -110,14 +41,14 @@ function getDbVer() {
         echo 1;
         // DB Server error
     } else {
-        $query = "SELECT ver FROM _version WHERE part='database'";
+        $query = "SELECT dbver FROM _version";
         if (!mysql_select_db($cfg->get('db_name'), $connection)) {
             // DB Error
         } else {
             $result = mysql_query($query);
 //			if ($result && mysql_num_rows($result)) {
             $row = mysql_fetch_array($result);
-            $curver = $row['ver'];
+            $curver = $row['dbver'];
 //			} else {
 //				$query = "SHOW TABLES LIKE 'player'";
 //				$result = mysql_query($query);
@@ -130,51 +61,6 @@ function getDbVer() {
     // Close database connection
     @mysql_close($connection);
     return $curver;
-}
-
-function verCmp($ver) {
-    $ver_arr = explode(".", $ver);
-
-    $i = 1;
-    $result = 0;
-    foreach ($ver_arr as $vbit) {
-        $result += $vbit * $i;
-        $i = $i / 100;
-    }
-    return $result;
-}
-
-// Record Error Log
-function ErrorLog($msg, $lvl) {
-    $cfg = new Config();
-
-    switch ($lvl) {
-        case -1:
-            $lvl_txt = 'INFO: ';
-            break;
-        case 0:
-            $lvl_txt = 'SECURITY: ';
-            break;
-        case 1:
-            $lvl_txt = 'ERROR: ';
-            break;
-        case 2:
-            $lvl_txt = 'WARNING: ';
-            break;
-        default:
-            $lvl_txt = 'NOTICE: ';
-            break;
-    }
-
-    if ($lvl <= $cfg->get('debug_lvl')) {
-        $err_msg = date('Y-m-d H:i:s') . " -- " . $lvl_txt . $msg . "\n";
-        $log = SYSTEM_PATH . DS . 'logs' . DS . $cfg->get('debug_log');
-        //$file = @fopen($cfg->get('debug_log'), 'a');
-        $file = @fopen($log, 'a');
-        @fwrite($file, $err_msg);
-        @fclose($file);
-        //echo "<br />----------------------------------------------------------------------------------------------------<br />$err_msg";
-    }
 }
 
 // Check SQL Results
@@ -195,45 +81,6 @@ function get_ext_ip() {
     preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $get, $ip);
     $var_ipaddr = $ip[0];
     return $var_ipaddr;
-}
-
-function getPageContents($url) {
-    // Try file() first
-    /*
-      if( function_exists('file') && function_exists('fopen') && ini_get('allow_url_fopen') ) {
-      //ini_set("user_agent","Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 5.0)");
-      ini_set("user_agent","GameSpyHTTP/1.0");
-      ini_set("auto_detect_line_endings", true);
-      $results = @file($url);
-      }
-     */
-    // either there was no function, or it failed -- try curl
-    if (!($results) && (function_exists('curl_exec'))) {
-        $curl_handle = curl_init();
-        curl_setopt($curl_handle, CURLOPT_URL, $url);
-        $sip = '127.0.0.1'; //change to external ip
-        //$sip = '195.140.177.250';
-        curl_setopt($curl_handle, CURLOPT_INTERFACE, $sip);
-        //curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 5.0)");
-        curl_setopt($curl_handle, CURLOPT_USERAGENT, "GameSpyHTTP/1.0");
-        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 1);
-        curl_setopt($curl_handle, CURLOPT_TIMEOUT, 10);
-        $results = curl_exec($curl_handle);
-        $err = curl_error($curl_handle);
-        if ($err != '') {
-            print "getData(): CURL failed: ";
-            print "$err";
-            return false;
-        }
-        $results = explode("\n", trim($results));
-        curl_close($curl_handle);
-    }
-
-    if (!$results) // still nothing, forgetd a'bout it
-        return false;
-
-    return $results;
 }
 
 function chkPath($path) {

@@ -8,7 +8,7 @@ $DataTables = array('army','awards','kills','kits','mapinfo','maps','player','pl
 
 
 // Do Tasks
-$task = $_POST['task'] ? $_POST['task'] : '';
+$task = isset($_POST['task']) ? $_POST['task'] : '';
 switch ($task) {
 	case "saveconfig":
 		showHeader('Save Configuration');
@@ -88,6 +88,13 @@ switch ($task) {
 		break;
 }
 
+
+// Check for login / logout requests
+if($_POST['action'] == 'login' && isset($_POST['formUser']) && isset($_POST['formPassword'])) 
+	Auth::Login($_POST['formUser'], $_POST['formPassword']);
+elseif($_POST['action'] == 'logout' || $_GET['action'] == 'logout') 
+	Auth::Logout();
+
 // Tidy up HTML
 echo "</pre></div>";
 
@@ -103,7 +110,7 @@ function showLog($msg) {
 	echo $outmsg;
 	
 	if ($cfg->get('admin_log') != '') {
-		$log = SYSTEM_PATH . DS . 'logs' . DS . $cfg->get('admin_log');
+		$log = ROOT . DS . 'logs' . DS . $cfg->get('admin_log');
 		$file = @fopen($log, 'a');
 		@fwrite($file, $outmsg);
 		@fclose($file);
@@ -201,7 +208,7 @@ function processImportLogs() {
 	// Find Log Files
 	showLog("Importing Log Files");
 	
-	$path = chkPath(SYSTEM_PATH . DS . $cfg->get('stats_logs'));
+	$path = SNAPSHOT_TEMP_PATH;
 	$dir = opendir($path);
 	chdir($path);
 	$files = [];
@@ -276,7 +283,7 @@ function processImportPlayers() {
 	DEFINE('__FAIL','<b><font color="red">Fail</font></b>');
 
 	showLog("include ea_support.php");
-	require_once(SYSTEM_PATH . DS . "ea_support.php");
+	require_once(ROOT . DS . "ea_support.php");
 	showLog("Done! :)");
 	$bfcoding  = &new ea_stats();
 

@@ -223,10 +223,6 @@ function configvalidation(thisform)
 		// Stats Processing
 		if (emptyvalidation(cfg__stats_ext,"The textfield is empty")==false) {cfg__stats_ext.focus(); return false;};
 		if (extvalidation(cfg__stats_ext,"The extension entered contains invalid charcters")==false) {cfg__stats_ext.focus(); return false;};
-		if (emptyvalidation(cfg__stats_logs,"The textfield is empty")==false) {cfg__stats_logs.focus(); return false;};
-		if (pathvalidation(cfg__stats_logs,"The path entered contains invalid charcters")==false) {cfg__stats_logs.focus(); return false;};
-		if (emptyvalidation(cfg__stats_logs_store,"The textfield is empty")==false) {cfg__stats_logs_store.focus(); return false;};
-		if (pathvalidation(cfg__stats_logs_store,"The path entered contains invalid charcters")==false) {cfg__stats_logs_store.focus(); return false;};
 		if (valuevalidation(cfg__stats_players_min,1,64,"'Player Stats MIN' MUST be in the range 1-64","I")==false) {cfg__stats_players_min.focus(); return false;};
 		if (valuevalidation(cfg__stats_players_max,1,256,"'Player Stats MAX' MUST be in the range 1-256","I")==false) {cfg__stats_players_max.focus(); return false;};
 		if (valuevalidation(cfg__stats_rank_tenure,1,365,"'Player Rank Tenure' MUST be in the range 1-365","I")==false) {cfg__stats_rank_tenure.focus(); return false;};

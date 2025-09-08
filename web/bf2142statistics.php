@@ -10,7 +10,10 @@ ob_start();
 */
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__));
-define('SYSTEM_PATH', ROOT);
+define('SYSTEM_PATH', ROOT . DS . 'system');
+define('SNAPSHOT_TEMP_PATH', SYSTEM_PATH . DS . 'snapshots' . DS . 'temp');
+define('SNAPSHOT_STORE_PATH', SYSTEM_PATH . DS . 'snapshots' . DS . 'processed');
+define('SNAPSHOT_BAD_PATH', SYSTEM_PATH . DS . 'snapshots' . DS . 'bad');
 
 
 /*
@@ -58,54 +61,21 @@ set_time_limit(0);
 ignore_user_abort(true);
 
 // Import configuration
-require_once(SYSTEM_PATH . DS . 'include/_ccconfig.php');
-require_once(SYSTEM_PATH . DS . 'include/rankSettings.php');
-require_once(SYSTEM_PATH . DS . 'include/utils.php');
+require_once(ROOT . DS . 'include/_ccconfig.php');
+require_once(ROOT . DS . 'include/rankSettings.php');
+require_once(ROOT . DS . 'include/utils.php');
+require(SYSTEM_PATH . DS . 'core'. DS .'Auth.php');
+require(SYSTEM_PATH . DS . 'functions.php');
 
 $cfg = new Config();
 DEFINE("_ERR_RESPONSE", "E\nH\tresponse\nD\t<font color=\"red\">ERROR</font>: ");
-
-// Open database connection
-$connection = @mysql_connect($db_host, $db_user, $db_pass);
-@mysql_select_db($db_name, $connection);
-
-
-$query0 = "SELECT ip FROM `servers` WHERE authorised=1";
-$result0 = mysql_query($query0);
-checkSQLResult($result0, $query0);
-$game_hosts = array();
-
-if (mysql_num_rows($result0)) {
-    while ($data0 = mysql_fetch_assoc($result0)) {
-        $game_hosts[] = $data0['ip'];
-    }
-//print_r($game_hosts);
-} else {
-    $errmsg = "NOT FOUND Authorised gamehosts in DB";
-    ErrorLog($errmsg, 0);
-    die(_ERR_RESPONSE . $errmsg);
-}
-
-// Check Database Version
-//$curdbver = getDbVer();
-//
-//if ($curdbver != $cfg->get('db_expected_ver')) {
-//	$errmsg = "Database version expected: ".$cfg->get('db_expected_ver').", Found: {$curdbver}";
-//	ErrorLog($errmsg, 1);
-//	die();
-//} else {
-//	$errmsg = "Database version expected: ".$cfg->get('db_expected_ver').", Found: {$curdbver}";
-//	ErrorLog($errmsg, 3);
-//}
-@mysql_close($connection);
-
-
 
 // Get URL POST data
 $rawdata = file_get_contents('php://input');
 //$rawdata = file_get_contents('data.txt');
 if ($LOG) {
-    $fp = fopen("logs/rawdata_". uniqid() . '_' . mt_rand() .".txt", "a+");
+    $tmpfile = SNAPSHOT_TEMP_PATH . DS . "rawdata_". uniqid() . '_' . mt_rand() .".txt";
+    $fp = fopen($tmpfile, "a+");
     fwrite($fp,$rawdata);
     fflush($fp);
     fclose($fp);
@@ -135,7 +105,8 @@ for ($x = 2; $x < count($gooddata); $x += 2) {
 }
 //!print_r($data);
 if ($LOG) {
-    $fp = fopen("logs/data_". uniqid() . '_' . mt_rand() .".txt","a+");
+    $tmpfile = SNAPSHOT_TEMP_PATH . DS . "data_". uniqid() . '_' . mt_rand() .".txt";
+    $fp = fopen($tmpfile, "a+");
     fwrite($fp,print_r($data,true));
     fflush($fp);
     fclose($fp);
@@ -162,66 +133,49 @@ if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != "") {
     $ip_s = $_SERVER['REMOTE_ADDR'];
 }
 
-// Build the full path to the stats file
-$statsDir = chkPath($cfg->get('stats_logs'));
 $stats_filename .= $mapdate . '_' . $mapname . $cfg->get('stats_ext');
-$fullPath = $statsDir . $stats_filename;
 
-// Check if the file doesn't exist before writing
-if (!file_exists($fullPath)) {
-    $file = @fopen($fullPath, 'wb');
-    if ($file) {
-        @fwrite($file, $rawdata);
-        @fclose($file);
-    } else {
-        ErrorLog("Failed to open file for writing: $fullPath", 3);
-    }
+$file = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
+$handle = @fopen($file, 'wb');
+if($handle)
+{
+    @fwrite($handle, $rawdata);
+    @fclose($handle);
+    
+    $errmsg = "SNAPSHOT Data Logged (". $file .")";
+    ErrorLog($errmsg, 3);
+}
+else
+{
+    $errmsg = "Unable to create a new SNAPSHOT Data Logfile (". $file . ")! Please make sure SNAPSHOT paths are writable!";
+    ErrorLog($errmsg, 1);
 }
 
-// Log success message
-$errmsg = "SNAPSHOT Data Logged ($fullPath)";
-ErrorLog($errmsg, 3);
+if (!is_dir(SNAPSHOT_BAD_PATH. DS)) {
+    mkdir(SNAPSHOT_BAD_PATH, 0777);
+}
+if (!is_dir(SNAPSHOT_BAD_PATH . DS . "BADTIME")) {
+    mkdir(SNAPSHOT_BAD_PATH . DS . "BADTIME", 0777);
+}
+if (!is_dir(SNAPSHOT_BAD_PATH . DS . "EOF")) {
+    mkdir(SNAPSHOT_BAD_PATH . DS . "EOF", 0777);
+}
+if (!is_dir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH")) {
+    mkdir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH", 0777);
+}
+if (!is_dir(SNAPSHOT_BAD_PATH . DS . "GAMEMOD")) {
+    mkdir(SNAPSHOT_BAD_PATH . DS . "GAMEMOD", 0777);
+}
 
-
-if (file_exists(chkPath($cfg->get('stats_logs')) . "")) {
-    
-} else {
-    mkdir(chkPath($cfg->get('stats_logs')) . "", 0777);
-}
-if (file_exists(chkPath($cfg->get('stats_logs')) . "bad")) {
-    
-} else {
-    mkdir(chkPath($cfg->get('stats_logs')) . "bad", 0777);
-}
-if (file_exists(chkPath($cfg->get('stats_logs')) . "bad/BADTIME")) {
-    
-} else {
-    mkdir(chkPath($cfg->get('stats_logs')) . "bad/BADTIME", 0777);
-}
-if (file_exists(chkPath($cfg->get('stats_logs')) . "bad/EOF")) {
-    
-} else {
-    mkdir(chkPath($cfg->get('stats_logs')) . "bad/EOF", 0777);
-}
-if (file_exists(chkPath($cfg->get('stats_logs')) . "bad/NOTAUTH")) {
-    
-} else {
-    mkdir(chkPath($cfg->get('stats_logs')) . "bad/NOTAUTH", 0777);
-}
-if (file_exists(chkPath($cfg->get('stats_logs')) . "bad/GAMEMOD")) {
-    
-} else {
-    mkdir(chkPath($cfg->get('stats_logs')) . "bad/GAMEMOD", 0777);
-}
 // Check for Complete Snapshot data
 //print_r($data);
 // Check remote host is authorised (simple security check)
-if (!checkIpAuth($game_hosts)) {
-    $errmsg = "Unauthorised Access Attempted! (IP: " . $_SERVER['REMOTE_ADDR'] . ")";
+if (!isIPInNetArray(Auth::ClientIp(), $cfg->get('game_hosts'))) {
+    $errmsg = "Unauthorised Access Attempted! (IP: " . Auth::ClientIp() . ")";
     ErrorLog($errmsg, 0);
-    $fn_src = chkPath($cfg->get('stats_logs')) . $stats_filename;
-    if (!file_exists(chkPath($cfg->get('stats_logs')) . "bad/NOTAUTH/" . $ip_s)) mkdir(chkPath($cfg->get('stats_logs')) . "bad/NOTAUTH/" . $ip_s, 0777);
-    $fn_dest = chkPath($cfg->get('stats_logs')) . "bad/NOTAUTH/" . $ip_s . "/" . $stats_filename;
+    $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
+    if (!is_dir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH" . DS . $ip_s)) mkdir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH" . DS . $ip_s, 0777);
+    $fn_dest = SNAPSHOT_BAD_PATH . DS . "NOTAUTH" . DS . $ip_s . DS . $stats_filename;
     if (file_exists($fn_src)) {
         if (file_exists($fn_dest)) {
             $errmsg = "SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})";
@@ -241,13 +195,11 @@ if (!checkIpAuth($game_hosts)) {
 if ($badtime) {
     $errmsg = "SNAPSHOT Data has badtime!";
     ErrorLog($errmsg, 1);
-    $fn_src = chkPath($cfg->get('stats_logs')) . $stats_filename;
-    if (file_exists(chkPath($cfg->get('stats_logs')) . "bad/BADTIME/" . $ip_s)) {
-        
-    } else {
-        mkdir(chkPath($cfg->get('stats_logs')) . "bad/BADTIME/" . $ip_s, 0777);
+    $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
+    if (!is_dir(SNAPSHOT_BAD_PATH . DS . "BADTIME" . DS . $ip_s)) {
+        mkdir(SNAPSHOT_BAD_PATH . DS . "BADTIME" . DS . $ip_s, 0777);
     }
-    $fn_dest = chkPath($cfg->get('stats_logs')) . "bad/BADTIME/" . $ip_s . "/" . $stats_filename;
+    $fn_dest = SNAPSHOT_BAD_PATH . DS . "BADTIME" . DS . $ip_s . DS . $stats_filename;
     if (file_exists($fn_src)) {
         if (file_exists($fn_dest)) {
             $errmsg = "SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})";
@@ -266,13 +218,11 @@ if ($badtime) {
 if ($data['EOF'] != 1) {
     $errmsg = "SNAPSHOT Data NOT complete!";
     ErrorLog($errmsg, 1);
-    $fn_src = chkPath($cfg->get('stats_logs')) . $stats_filename;
-    if (file_exists(chkPath($cfg->get('stats_logs')) . "bad/EOF/" . $ip_s)) {
-        
-    } else {
-        mkdir(chkPath($cfg->get('stats_logs')) . "bad/EOF/" . $ip_s, 0777);
+    $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
+    if (!is_dir(SNAPSHOT_BAD_PATH . DS . "EOF" . DS . $ip_s)) {
+        mkdir(SNAPSHOT_BAD_PATH . DS . "EOF" . DS . $ip_s, 0777);
     }
-    $fn_dest = chkPath($cfg->get('stats_logs')) . "bad/EOF/" . $ip_s . "/" . $stats_filename;
+    $fn_dest = SNAPSHOT_BAD_PATH . DS . "EOF" . DS . $ip_s . DS . $stats_filename;
     if (file_exists($fn_src)) {
         if (file_exists($fn_dest)) {
             $errmsg = "SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})";
@@ -291,13 +241,11 @@ if ($data['EOF'] != 1) {
 if (0) {
     $errmsg = "SNAPSHOT Data NOT True GameMod!";
     ErrorLog($errmsg, 1);
-    $fn_src = chkPath($cfg->get('stats_logs')) . $stats_filename;
-    if (file_exists(chkPath($cfg->get('stats_logs')) . "bad/GAMEMOD/" . $ip_s)) {
-        
-    } else {
-        mkdir(chkPath($cfg->get('stats_logs')) . "bad/GAMEMOD/" . $ip_s, 0777);
+    $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
+    if (!is_dir(SNAPSHOT_BAD_PATH . DS . "GAMEMODE" . DS . $ip_s)) {
+        mkdir(SNAPSHOT_BAD_PATH . DS . "GAMEMODE" . DS . $ip_s, 0777);
     }
-    $fn_dest = chkPath($cfg->get('stats_logs')) . "bad/GAMEMOD/" . $ip_s . "/" . $stats_filename;
+    $fn_dest = SNAPSHOT_BAD_PATH . DS . "GAMEMODE" . DS . $ip_s . DS . $stats_filename;
     if (file_exists($fn_src)) {
         if (file_exists($fn_dest)) {
             $errmsg = "SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})";
@@ -1443,20 +1391,16 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
      * Process 'Archive Data File'
      * ****************************** */
     if ($cfg->get('stats_move_logs')) {
-        $storePath = chkPath($cfg->get('stats_logs_store'));
-        $logDir = chkPath($cfg->get('stats_logs'));
-        $targetDir = $storePath . $ip_s;
-    
+        $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
+        $fn_dest = SNAPSHOT_STORE_PATH . DS . $ip_s . DS . $stats_filename;
+
         // Ensure target directory exists
-        if (!is_dir($targetDir)) {
-            if (!mkdir($targetDir, 0777, true)) {
+        if (!is_dir(SNAPSHOT_STORE_PATH . DS . $ip_s)) {
+            if (!mkdir(SNAPSHOT_STORE_PATH . DS . $ip_s, 0777, true)) {
                 ErrorLog("Failed to create directory: {$targetDir}", 1);
                 return;
             }
         }
-    
-        $fn_src = $logDir . $stats_filename;
-        $fn_dest = $targetDir . '/' . $stats_filename;
     
         if (file_exists($fn_src)) {
             if (file_exists($fn_dest)) {
@@ -1555,10 +1499,10 @@ function checkBackendAwards() {
 $string = ob_get_contents();
 echo $string;
 if ($LOG) {
-$fp = fopen("logs/output".time().".txt","a+");
-fwrite($fp,$string);
-fflush($fp);
-fclose($fp);
+    $fp = fopen(SNAPSHOT_TEMP_PATH . DS . "output".time().".txt","a+");
+    fwrite($fp,$string);
+    fflush($fp);
+    fclose($fp);
 }
 
 ?>

@@ -7,7 +7,7 @@ if (!checkSession()) {
 	showLoginForm();
 } else {
 	// Do Tasks
-	$task = $_GET['task'] ? $_GET['task'] : $_POST['task'];
+	$task = isset($_GET['task']) ? $_GET['task'] : $_POST['task'];
 
 	switch ($task) {
 		case "home":
@@ -256,12 +256,6 @@ function showConfigForm() {
 				<td align="left" valign="top" class="form-desc">Extension for SNAPSHOT logs (Default: '.stats').</td>
 			</tr>
 			<tr>
-				<td align="right" valign="middle" class="form-text">SNAPSHOT Log Path:</td>
-				<td align="left" valign="middle">
-				<input type="text" name="cfg__stats_logs" size="20" tabindex="<?php echo $i++; ?>" class="inputbox" value="<?php echo $cfg->get('stats_logs'); ?>" /></td>
-				<td align="left" valign="top" class="form-desc">Path to store SNAPSHOT logs during processing (Include trailing '/').</td>
-			</tr>
-			<tr>
 				<td align="right" valign="middle" class="form-text">Archive SNAPSHOTS:</td>
 				<td align="left" valign="middle">
 					<select name="cfg__stats_move_logs" tabindex="<?php echo $i++; ?>" class="inputbox">
@@ -270,12 +264,6 @@ function showConfigForm() {
 					</select>
 				</td>
 				<td align="left" valign="top" class="form-desc">Archive SNAPSHOTS logs after processing</td>
-			</tr>
-			<tr>
-				<td align="right" valign="middle" class="form-text">SNAPSHOT Archive Path:</td>
-				<td align="left" valign="middle">
-				<input type="text" name="cfg__stats_logs_store" size="20" tabindex="<?php echo $i++; ?>" class="inputbox" value="<?php echo $cfg->get('stats_logs_store'); ?>" /></td>
-				<td align="left" valign="top" class="form-desc">Path to archive SNAPSHOT logs after processing (Include trailing '/').</td>
 			</tr>
 			<tr>
 				<td align="right" valign="middle" class="form-text">Min. Game Time (Global):</td>

@@ -9,7 +9,7 @@
 */
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__));
-define('SYSTEM_PATH', ROOT);
+define('SYSTEM_PATH', ROOT . DS . 'system');
 
 
 /*
@@ -24,6 +24,9 @@ if (!getenv('PHP_VERSION')) {
     ini_set("error_log", SYSTEM_PATH . DS . 'logs' . DS . 'php_errors.log');
 }
 ini_set("display_errors", "0");
+
+// Disable Zlib Compression
+ini_set('zlib.output_compression', '0');
 
 $r = $_REQUEST;
 $str = "";
