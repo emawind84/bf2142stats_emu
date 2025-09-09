@@ -379,7 +379,11 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 $globals['mapkills'] += $data["klls_$x"];
                 $globals['mapdeaths'] += $data["dths_$x"];
 
-                /*                 * ******************************
+                // Fix LAN IP's (ignore LocalHost as that's for 'bots)
+                if(isPrivateIp($data["ip_$x"])) 
+                    $data["ip_$x"] = $cfg->get('stats_lan_override');
+            
+                /* *******************************
                  * Process 'Player'
                  * ****************************** */
                 ErrorLog("Processing Player (" . $data["pid_$x"] . ")", 3);
@@ -409,18 +413,59 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 
                 if (!mysql_num_rows($result1)) {
                     ErrorLog("Player (" . $data["pid_$x"] . ") not found in `subaccount`.", 3);
+                    
+                    // Find country
+                    $query = "SELECT `country` FROM `ip2nation` WHERE `ip` < INET_ATON(" . $data["ip_$x"] . ") ORDER BY `ip` DESC LIMIT 1";
+                    $res = mysql_query($query);
+                    $countryRow = mysql_fetch_assoc($res);
+                    $country = $countryRow['country'];
+                    
+                    if(empty($country))
+                        $country = 'xx';
 
-                    $query1 = "INSERT INTO subaccount SET subaccount = '". $data["nick_$x"] ."'" .
-                            ", id = '" . $data["pid_$x"] . "'" .
-                            ", profileid = '" . $data["pid_$x"] . "';";
-                    $result1 = mysql_query($query1);
-                    checkSQLResult ($result1, $query1);
-                    ErrorLog(">>>>>>>>>>" . $query1 . "", 3);
+                    $query = "INSERT INTO subaccount SET 
+                            subaccount = '". $data["nick_$x"] ."',
+                            id = '" . $data["pid_$x"] . "',
+                            profileid = '" . $data["pid_$x"] . "',
+                            ip = '" . $data["ip_$x"] . "',
+                            country = '{$country}';";
+                    $result = mysql_query($query);
+                    checkSQLResult ($result, $query);
 
-                    $query1 = "SELECT * FROM subaccount s " .
+                    $query = "SELECT * FROM subaccount s " .
                             " WHERE s.id=" . $data["pid_$x"];
-                    $result1 = mysql_query($query1);
-                    checkSQLResult($result1, $query1);
+                    $result = mysql_query($query);
+                    checkSQLResult($result, $query);
+                }
+                else
+                {
+                    ErrorLog("Updating EXISTING Player (".$data["pid_$x"].")",3);
+
+                    $query = "SELECT `ip`, `country` FROM `subaccount` WHERE `id` = ". intval($data["pid_$x"]);
+                    $result = mysql_query($query);
+                    checkSQLResult($result, $query);
+                    $row = mysql_fetch_assoc($result);
+
+                    // Check IP
+                    if($row['ip'] != $data["ip_$x"] && $data["ip_$x"] != '127.0.0.1')
+                    {
+                        // Find country
+                        $query = "SELECT `country` FROM `ip2nation` WHERE `ip` < INET_ATON('". $data["ip_$x"] ."') ORDER BY `ip` DESC LIMIT 1";
+                        $res = mysql_query($query);
+                        checkSQLResult($result, $query);
+                        $countryRow = mysql_fetch_assoc($res);
+                        $country = $countryRow['country'];
+                    }
+                    else 
+                        $country = $row['country'];
+                    
+                    // Fix empty country
+                    if(empty($country))
+                        $country = 'xx';
+
+                    $query = "UPDATE subaccount SET country = '{$country}', ip = '" . $data["ip_$x"] . "' WHERE `id` = ". intval($data["pid_$x"]);
+                    $result1 = mysql_query($query);
+                    checkSQLResult($result1, $query);
                 }
                 $data2 = mysql_fetch_assoc($result1);
 
@@ -598,7 +643,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                         $res = mysql_query($query);
                         checkSQLResult($res, $query);
                     }
-                    // $query3p .= " `pdt`='" . $data["pdt_$x"] . "',";
+                    $query3p .= " `pdt`='" . $data["pdt_$x"] . "',";
                 }
                 if (isset($data["pdtc_$x"]) AND $data["pdtc_$x"] > 0) {
                     $query3p .= " `pdtc`=(`pdtc`+" . $data["pdtc_$x"] . "),";

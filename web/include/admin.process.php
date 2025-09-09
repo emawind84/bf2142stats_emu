@@ -212,7 +212,7 @@ function processImportLogs() {
 	$dir = opendir($path);
 	chdir($path);
 	$files = [];
-	$regex = '/.*([0-9]{4})([0-9]{2})([0-9]{2})_([0-9]{4}).*' . preg_quote($cfg->get('stats_ext'), '/') . '$/';
+	$regex = '/.*-([0-9]{4})([0-9]{2})([0-9]{2})_([0-9]{4})_.*' . preg_quote($cfg->get('stats_ext'), '/') . '$/';
 	while (($file = readdir($dir)) !== false) {
 		// Skip dot directories
 		if ($file === '.' || $file === '..') {

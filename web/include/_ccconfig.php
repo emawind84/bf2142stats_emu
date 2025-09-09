@@ -29,6 +29,7 @@ $stats_min_player_game_time = 0;
 $stats_players_min = 1;
 $stats_players_max = 256;
 $stats_server_host = 'stella.prod.emawind.com';
+$stats_lan_override = '174.49.21.221';
 
 $debug_lvl = 4;
 

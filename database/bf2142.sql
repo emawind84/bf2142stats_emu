@@ -995,6 +995,7 @@ CREATE TABLE IF NOT EXISTS `subaccount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `profileid` int(10) unsigned NOT NULL,
   `subaccount` varchar(45) NOT NULL,
+  `country` varchar(2) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10000009 ;
 
@@ -1025,19 +1026,28 @@ CREATE TABLE IF NOT EXISTS `_version` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+-- bf2142stats_dev.dogtag_events definition
+
 CREATE TABLE IF NOT EXISTS `dogtag_events` (
-  `id` int(11) NOT NULL,
-  `killer_id` int(10) UNSIGNED NOT NULL,
-  `victim_id` int(10) UNSIGNED NOT NULL,
-  `cnt` int(10)  UNSIGNED NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `killer_id` int(10) unsigned NOT NULL,
+  `victim_id` int(10) unsigned NOT NULL,
+  `cnt` int(10) unsigned NOT NULL DEFAULT '0',
   `timestamp` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `gm` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'game mode',
-  `mapid` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'map id'
+  `gm` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'game mode',
+  `mapid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'map id',
+  PRIMARY KEY (`id`),
+  KEY `killer_id` (`killer_id`,`victim_id`,`timestamp`,`mapid`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+
+
+
+
+-- bf2stats.ip2nation definition
+
+CREATE TABLE `ip2nation` (
+  `ip` int(11) unsigned NOT NULL DEFAULT '0',
+  `country` char(2) NOT NULL DEFAULT '',
+  PRIMARY KEY (`ip`),
+  KEY `ip` (`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-ALTER TABLE `dogtag_events`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `killer_id` (`killer_id`,`victim_id`,`timestamp`,`mapid`);
-
-ALTER TABLE `dogtag_events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;

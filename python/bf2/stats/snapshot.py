@@ -1,6 +1,7 @@
 
 import host
 import bf2.PlayerManager
+import re
 import fpformat
 from constants import *
 from bf2 import g_debug
@@ -230,58 +231,65 @@ def getPlayerSnapshot(playerStat):
 	if g_debug: print "snapshot.py: playerStat.profileId"
 	awayBonus = int(playerStat.localScore.awayBonusScoreIAR + playerStat.localScore.awayBonusScore)
 	totalScore = (playerStat.score - playerStat.localScore.diffRankScore) + int(playerStat.localScore.experienceScoreIAR + playerStat.localScore.experienceScore) + int(awayBonus)
+	match = re.search(r'^\S+\s+(.*)', playerStat.name)
+	nickname = match.group(1)
 	playerKeys = 	[
-			("ban",		playerStat.timesBanned						),	#+ => total bans na server
-			("c",		playerStat.complete							),	#? => Complete
-			("capa",		playerStat.localScore.cpAssists					),	#+ => Capture Assists
-			("cpt",		playerStat.localScore.cpCaptures					),	#+ => Captured CPs
-			("crpt",		totalScore							),	#+ => Career Points
-			("cs",		playerStat.localScore.commanderBonusScore				),	#+ => Commander Score
-			("dass",		playerStat.localScore.driverAssists					),	#+ => Driver Assists
-			("dcpt",		playerStat.localScore.cpDefends					),	#+ => Defended Control Points
-			("dstrk",		playerStat.longestDeathStreak						),	#> => Worst Death Streak
-			("dths",		playerStat.deaths							),	#+ => Deaths
-			("gsco",		playerStat.score							),	#+ => Global Score
-			("hls",		playerStat.localScore.heals						),	#+ => Heals
-			("kick",		playerStat.timesKicked						),	#+ => total kicks from servers
-			("klla",		playerStat.localScore.damageAssists					),	#+ => Kill Assists
-			("klls",		playerStat.kills							),	#+ => Kills
-			("klstrk",	playerStat.longestKillStreak						),	#> => Kills Streak
-			("kluav",		playerStat.weapons[WEAPON_TYPE_RECON_DRONE].kills				),	#+ => Kills With Gun Drone
-			("nick",		playerStat.name							),	#? => Nickname
-			("ncpt",		playerStat.localScore.cpNeutralizes					),	#+ => Neutralized CPs
-			("pdt",		playerStat.dogTags							),	#+ => Unique Dog Tags Collected
-			("pdtc",		playerStat.dogtagCount						),	#+ => Dog Tags Collected
-			("pid",		playerStat.profileId						),	#? => pID
-			("resp",		playerStat.localScore.ammos						),	#+ => Re-supplies
-			("rnk",		playerStat.rank							),	#> => Rank
-			("rnkcg",		playerStat.roundRankup						),	#? => RankUp?
-			("rps",		playerStat.localScore.repairs						),	#+ => Repairs
-			("rvs",		playerStat.localScore.revives						),	#+ => Revives
-			("slbspn",	playerStat.squadLeaderBeaconSpawns					),	#+ => Spawns On Squad Beacons
-			("sluav",		playerStat.squadLeaderUAV						),	#+ => Spawn Dron Deployed
-			("suic",		playerStat.localScore.suicides					),	#+ => Suicides
-			("tac",		int(playerStat.timeAsCmd)						),	#+ => Time As Commander
-			("talw",		int(playerStat.timePlayed - playerStat.timeAsCmd - playerStat.timeInSquad)	),	#+ => Time As Lone Wolf
-			("tas",		playerStat.localScore.titanAttackKills					),	#+ => Titan Attack Score
-			("tasl",		int(playerStat.timeAsSql)						),	#+ => Time As Squad Leader
-			("tasm",		int(playerStat.timeInSquad - playerStat.timeAsSql)			),	#+ => Time As Squad Member
-			("tcd",		playerStat.localScore.titanPartsDestroyed				),	#+ => Titan Components Destroyed
-			("tcrd",		playerStat.localScore.titanCoreDestroyed				),	#+ => Titan Cores Destroyed
-			("tdmg",		playerStat.localScore.teamDamages					),	#+ => Team Damage
-			("tdrps",		playerStat.localScore.titanDrops					),	#+ => Titan Drops
-			("tds",		playerStat.localScore.titanDefendKills					),	#+ => Titan Defend Score
-			("tgd",		playerStat.localScore.titanWeaponsDestroyed				),	#+ => Titan Guns Destroyed
-			("tgr",		playerStat.localScore.titanWeaponsRepaired				),	#+ => Titan Guns Repaired
-			("tkls",		playerStat.teamkills						),	#+ => Team Kills
-			("toth",		playerStat.bulletsHit						),	#+ => Total Hits
-			("tots",		playerStat.bulletsFired						),	#+ => Total Fired
-			("tt",		int(playerStat.timePlayed)						),	#+ => Time Played
-			("tvdmg",		playerStat.localScore.teamVehicleDamages				),	#+ => Team Vehicle Damage
-			("twsc",		playerStat.teamScore						),	#+ => Teamwork Score
-			("t",		playerStat.team							),	# => TeamID
-			
-			]
+		# main keys 
+		("pid",		playerStat.profileId								),	#? => pID
+		("nick",	playerStat.name										),	#? => Nickname
+		("t",		playerStat.team										),
+		("a",		playerStat.army										),
+		("tt",		int(playerStat.timePlayed)							),	#+ => Time Played
+		("c",		playerStat.complete									),
+		("ip",		playerStat.ipaddr									),
+		#("ai",		playerStat.isAIPlayer								),
+
+		("ban",		playerStat.timesBanned								),	#+ => total bans na server
+		("capa",	playerStat.localScore.cpAssists						),	#+ => Capture Assists
+		("cpt",		playerStat.localScore.cpCaptures					),	#+ => Captured CPs
+		("crpt",	totalScore											),	#+ => Career Points
+		("cs",		playerStat.localScore.commanderBonusScore			),	#+ => Commander Score
+		("dass",	playerStat.localScore.driverAssists					),	#+ => Driver Assists
+		("dcpt",	playerStat.localScore.cpDefends						),	#+ => Defended Control Points
+		("dstrk",	playerStat.longestDeathStreak						),	#> => Worst Death Streak
+		("dths",	playerStat.deaths									),	#+ => Deaths
+		("gsco",	playerStat.score									),	#+ => Global Score
+		("hls",		playerStat.localScore.heals							),	#+ => Heals
+		("kick",	playerStat.timesKicked								),	#+ => total kicks from servers
+		("klla",	playerStat.localScore.damageAssists					),	#+ => Kill Assists
+		("klls",	playerStat.kills									),	#+ => Kills
+		("klstrk",	playerStat.longestKillStreak						),	#> => Kills Streak
+		("kluav",	playerStat.weapons[WEAPON_TYPE_RECON_DRONE].kills	),	#+ => Kills With Gun Drone
+		("ncpt",	playerStat.localScore.cpNeutralizes					),	#+ => Neutralized CPs
+		("pdt",		playerStat.dogTags									),	#+ => Unique Dog Tags Collected
+		("pdtc",	playerStat.dogtagCount								),	#+ => Dog Tags Collected
+		("resp",	playerStat.localScore.ammos							),	#+ => Re-supplies
+		("rnk",		playerStat.rank										),	#> => Rank
+		("rnkcg",	playerStat.roundRankup								),	#? => RankUp?
+		("rps",		playerStat.localScore.repairs						),	#+ => Repairs
+		("rvs",		playerStat.localScore.revives						),	#+ => Revives
+		("slbspn",	playerStat.squadLeaderBeaconSpawns					),	#+ => Spawns On Squad Beacons
+		("sluav",	playerStat.squadLeaderUAV							),	#+ => Spawn Dron Deployed
+		("suic",	playerStat.localScore.suicides						),	#+ => Suicides
+		("tac",		int(playerStat.timeAsCmd)							),	#+ => Time As Commander
+		("talw",	int(playerStat.timePlayed - playerStat.timeAsCmd - playerStat.timeInSquad)	),	#+ => Time As Lone Wolf
+		("tas",		playerStat.localScore.titanAttackKills				),	#+ => Titan Attack Score
+		("tasl",	int(playerStat.timeAsSql)							),	#+ => Time As Squad Leader
+		("tasm",	int(playerStat.timeInSquad - playerStat.timeAsSql)	),	#+ => Time As Squad Member
+		("tcd",		playerStat.localScore.titanPartsDestroyed			),	#+ => Titan Components Destroyed
+		("tcrd",	playerStat.localScore.titanCoreDestroyed			),	#+ => Titan Cores Destroyed
+		("tdmg",	playerStat.localScore.teamDamages					),	#+ => Team Damage
+		("tdrps",	playerStat.localScore.titanDrops					),	#+ => Titan Drops
+		("tds",		playerStat.localScore.titanDefendKills				),	#+ => Titan Defend Score
+		("tgd",		playerStat.localScore.titanWeaponsDestroyed			),	#+ => Titan Guns Destroyed
+		("tgr",		playerStat.localScore.titanWeaponsRepaired			),	#+ => Titan Guns Repaired
+		("tkls",	playerStat.teamkills								),	#+ => Team Kills
+		("toth",	playerStat.bulletsHit								),	#+ => Total Hits
+		("tots",	playerStat.bulletsFired								),	#+ => Total Fired
+		("tvdmg",	playerStat.localScore.teamVehicleDamages			),	#+ => Team Vehicle Damage
+		("twsc",	playerStat.teamScore								),	#+ => Teamwork Score
+		
+	]
 
 	# victims / victimizers
 	statsMap = getStatsMap()
