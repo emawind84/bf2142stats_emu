@@ -71,17 +71,17 @@ H\tsearchpattern
 D\t".$nick."
 H\tpid\tnick";
 
-$query1 = "SELECT id, subaccount FROM `subaccount` WHERE subaccount REGEXP '".$nick."' LIMIT 20";
+$query1 = "SELECT pid, nick FROM `playerprogress` WHERE nick REGEXP '".$nick."' LIMIT 20";
 $result1 = mysql_query($query1) or die(mysql_error());
 if (!mysql_num_rows($result1)) {
 	errorcode(104);
 	exit;
 } else {
 	while ($row = mysql_fetch_array($result1)) {
-		$pid = $row['id'];
-		$nickname = rawurldecode($row['subaccount']);
+		$pid = $row['pid'];
+		$nickname = rawurldecode($row['nick']);
 		$Out .= "\nD\t".$pid."\t".$nickname;
-		error_log(">>>".$row['subaccount']);
+		error_log(">>>".$row['nick']);
 	}
 }
 /*

@@ -216,6 +216,7 @@ CREATE TABLE IF NOT EXISTS `servers` (
   `bydnsname` int(11) NOT NULL,
   `dnshost` int(11) NOT NULL,
   `lastupdate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `publicaddress` varchar(100) CHARACTER SET utf8 NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ip-prefix-unq` (`ip`,`prefix`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;

@@ -298,9 +298,9 @@ $globals['mode3'] = 3; // Mode: gpm_coop	= Co-op (ie, 'Bots)
 if (isset($data["gm"])) {
     // Unknown will get set to 99, which effectively ignores this mode
     $globals["mode" . $data["gm"]] = 1;
-    if ($data["gm"] == 3) {
-        $data["gm"] = 0;
-    }
+    // if ($data["gm"] == 3) {
+    //     $data["gm"] = 0;
+    // }
 }
 
 //Sinth Comment
@@ -394,7 +394,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                         " LEFT JOIN `stats_m` m ON m.pid=p.pid" .
                         " LEFT JOIN `stats_v` v ON v.pid=p.pid" .
                         " LEFT JOIN `stats_w` w ON w.pid=p.pid" .
-                        " WHERE s.id=" . $data["pid_$x"] . " AND a._gm=" . $data["gm"] . " AND a._date='" . $currdate . "' LIMIT 1";
+                        " WHERE s.id=" . $data["pid_$x"] . " AND a._gm=" . $data["gm"] . " AND a._date='" . $mapdate . "' LIMIT 1";
                 $result1 = mysql_query($query1);
                 checkSQLResult($result1, $query1);
                 if (!mysql_num_rows($result1)) {
@@ -416,8 +416,8 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                     
                     // Find country
                     $query = "SELECT `country` FROM `ip2nation` WHERE `ip` < INET_ATON(" . $data["ip_$x"] . ") ORDER BY `ip` DESC LIMIT 1";
-                    $res = mysql_query($query);
-                    $countryRow = mysql_fetch_assoc($res);
+                    $result_tmp1 = mysql_query($query);
+                    $countryRow = mysql_fetch_assoc($result_tmp1);
                     $country = $countryRow['country'];
                     
                     if(empty($country))
@@ -429,31 +429,31 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                             profileid = '" . $data["pid_$x"] . "',
                             ip = '" . $data["ip_$x"] . "',
                             country = '{$country}';";
-                    $result = mysql_query($query);
-                    checkSQLResult ($result, $query);
+                    $result_tmp1 = mysql_query($query);
+                    checkSQLResult ($result_tmp1, $query);
 
                     $query = "SELECT * FROM subaccount s " .
                             " WHERE s.id=" . $data["pid_$x"];
-                    $result = mysql_query($query);
-                    checkSQLResult($result, $query);
+                    $result_tmp1 = mysql_query($query);
+                    checkSQLResult($result_tmp1, $query);
                 }
                 else
                 {
                     ErrorLog("Updating EXISTING Player (".$data["pid_$x"].")",3);
 
                     $query = "SELECT `ip`, `country` FROM `subaccount` WHERE `id` = ". intval($data["pid_$x"]);
-                    $result = mysql_query($query);
-                    checkSQLResult($result, $query);
-                    $row = mysql_fetch_assoc($result);
+                    $result_tmp1 = mysql_query($query);
+                    checkSQLResult($result_tmp1, $query);
+                    $row = mysql_fetch_assoc($result_tmp1);
 
                     // Check IP
                     if($row['ip'] != $data["ip_$x"] && $data["ip_$x"] != '127.0.0.1')
                     {
                         // Find country
                         $query = "SELECT `country` FROM `ip2nation` WHERE `ip` < INET_ATON('". $data["ip_$x"] ."') ORDER BY `ip` DESC LIMIT 1";
-                        $res = mysql_query($query);
-                        checkSQLResult($result, $query);
-                        $countryRow = mysql_fetch_assoc($res);
+                        $result_tmp1 = mysql_query($query);
+                        checkSQLResult($result_tmp1, $query);
+                        $countryRow = mysql_fetch_assoc($result_tmp1);
                         $country = $countryRow['country'];
                     }
                     else 
@@ -464,9 +464,10 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                         $country = 'xx';
 
                     $query = "UPDATE subaccount SET country = '{$country}', ip = '" . $data["ip_$x"] . "' WHERE `id` = ". intval($data["pid_$x"]);
-                    $result1 = mysql_query($query);
-                    checkSQLResult($result1, $query);
+                    $result_tmp1 = mysql_query($query);
+                    checkSQLResult($result_tmp1, $query);
                 }
+
                 $data2 = mysql_fetch_assoc($result1);
 
                 //AND m.gm=".$data["gm"]." AND m.mapid=".$data["m"]." 
@@ -509,8 +510,8 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 //vet	???
                 //date               
 
-                $query3a .= " `_date`='" . $currdate . "',";
-
+                $query3a .= " `_date`='" . $mapdate . "',";
+                $query3m .= " `gm`=" . $data['gm'] . ", `mapid`=" . $data['m'] . ",";
 
                 //nick
                 if (!isset($data2['nick'])) {
@@ -588,7 +589,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                     $query3a .= " `_gsco`=(`_gsco`+" . $data["gsco_$x"] . "),";
 //Map data
                     //$query3m .= " `msc-" . $data['gm'] . "-" . $data['m'] . "`=(`msc-" . $data['gm'] . "-" . $data['m'] . "`+" . $data["gsco_$x"] . "),";
-                    $query3m .= " `gm`=" . $data['gm'] . ", `mapid`=" . $data['m'] . ", `msc`=`msc`+" . $data["gsco_$x"] . ",";
+                    $query3m .= " `msc`=`msc`+" . $data["gsco_$x"] . ",";
 
                     //$m_array = array("mbr","mlos","msc","mtt","mwin");
                     // "mbr-".$data['gm']."-".$data['m'];
@@ -1068,12 +1069,12 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 
                 if ($query3a) {
                     //stats_a
-                    $query = "SELECT * FROM `stats_a` WHERE pid='" . $data["pid_$x"] . "' AND _gm='" . $data["gm"] . "' AND _date='" . $currdate . "' LIMIT 1";
+                    $query = "SELECT * FROM `stats_a` WHERE pid='" . $data["pid_$x"] . "' AND _gm='" . $data["gm"] . "' AND _date='" . $mapdate . "' LIMIT 1";
                     $res = mysql_query($query);
                     if (!mysql_num_rows($res)) {
                         $query = "INSERT INTO stats_a SET " . rtrim($query3a, ",") . ", `pid`='" . $data["pid_$x"] . "'";
                     } else {
-                        $query = "UPDATE stats_a SET " . rtrim($query3a, ",") . " WHERE `pid`='" . $data["pid_$x"] . "' AND _gm='" . $data["gm"] . "' AND _date='" . $currdate . "'";
+                        $query = "UPDATE stats_a SET " . rtrim($query3a, ",") . " WHERE `pid`='" . $data["pid_$x"] . "' AND _gm='" . $data["gm"] . "' AND _date='" . $mapdate . "'";
                     }
                     $res = mysql_query($query);
                 }
@@ -1082,12 +1083,14 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                     //stats_m
                     $query = "SELECT * from stats_m m WHERE pid='" . $data["pid_$x"] . "' AND m.gm=" . $data["gm"] . " AND m.mapid=" . $data["m"] . " LIMIT 1";
                     $res = mysql_query($query);
+                    checkSQLResult($res, $query);
                     if (!mysql_num_rows($res)) {
                         $query = "INSERT INTO stats_m SET " . rtrim($query3m, ",") . ", `pid`='" . $data["pid_$x"] . "'";
                     } else {
                         $query = "UPDATE stats_m SET " . rtrim($query3m, ",") . " WHERE `pid`='" . $data["pid_$x"] . "' AND gm='" . $data["gm"] . "'";
                     }
                     $res = mysql_query($query);
+                    checkSQLResult($res, $query);
                 }
 
                 $table_array = array("w", "e", "v");

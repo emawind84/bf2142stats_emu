@@ -90,37 +90,37 @@ switch ($mode) {
 		$query1 = "SELECT a._lgdt AS date,(a._gsco+a._crpt) AS points, a._gsco AS globalscore,a._crpt AS experiencepoints, awaybonus 
                     FROM `stats_a` a
                     LEFT JOIN playerprogress p ON p.pid = a.pid
-                    WHERE a.pid='".$authPID."' ORDER BY a._date DESC LIMIT 20";                
+                    WHERE a.pid='".$authPID."' ORDER BY a._date DESC";                
 	break;
 	case "score":
-		$query1 = "SELECT _lgdt AS date, _gsco AS score FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _gsco AS score FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "ttp":
-		$query1 = "SELECT _lgdt AS date, _ttp AS ttp FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";            
+		$query1 = "SELECT _lgdt AS date, _ttp AS ttp FROM `stats_a` WHERE pid='".$authPID."'";            
 	break;
 	case "kills":
-		$query1 = "SELECT _lgdt AS date, _kpm AS kpm, _dpm AS dpm  FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _kpm AS kpm, _dpm AS dpm  FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "spm":
-		$query1 = "SELECT _lgdt AS date, _spm AS spm FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _spm AS spm FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "role":
-		$query1 = "SELECT _lgdt AS date, _tac AS cotime, _tasl AS sltime, _tasm AS smtime, _talw AS lwtime, _ttp AS ttp FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _tac AS cotime, _tasl AS sltime, _tasm AS smtime, _talw AS lwtime, _ttp AS ttp FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "flag":
-		$query1 = "SELECT _lgdt AS date, _cpt AS captures, _capa AS assist, _dcpt AS defend FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _cpt AS captures, _capa AS assist, _dcpt AS defend FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "waccu":
-		$query1 = "SELECT _lgdt AS date, _ovaccu AS waccu FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _ovaccu AS waccu FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "wl":
-		$query1 = "SELECT _lgdt AS date, _wins AS wins, _losses AS losses FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _wins AS wins, _losses AS losses FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "twsc":
-		$query1 = "SELECT _lgdt AS date, _twsc as twsc FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _twsc as twsc FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 	case "sup":
-		$query1 = "SELECT _lgdt AS date, _hls AS hls, _rps AS rps, _rvs AS rvs, _resp AS resp FROM `stats_a` WHERE pid='".$authPID."' LIMIT 20";
+		$query1 = "SELECT _lgdt AS date, _hls AS hls, _rps AS rps, _rvs AS rvs, _resp AS resp FROM `stats_a` WHERE pid='".$authPID."'";
 	break;
 }
 $result1 = mysql_query($query1) or die(mysql_error());
