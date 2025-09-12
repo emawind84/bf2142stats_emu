@@ -996,7 +996,8 @@ CREATE TABLE IF NOT EXISTS `subaccount` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `profileid` int(10) unsigned NOT NULL,
   `subaccount` varchar(45) NOT NULL,
-  `country` varchar(2) DEFAULT NULL,
+  `country` varchar(2) DEFAULT 'xx',
+  `ip` varchar(15) DEFAULT '',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10000009 ;
 
@@ -1046,9 +1047,153 @@ CREATE TABLE IF NOT EXISTS `dogtag_events` (
 
 -- bf2stats.ip2nation definition
 
-CREATE TABLE `ip2nation` (
+CREATE TABLE IF NOT EXISTS `ip2nation` (
   `ip` int(11) unsigned NOT NULL DEFAULT '0',
   `country` char(2) NOT NULL DEFAULT '',
   PRIMARY KEY (`ip`),
   KEY `ip` (`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+-- bf2stats.round_history definition
+
+CREATE TABLE IF NOT EXISTS `round_history` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `timestamp` int(10) unsigned NOT NULL DEFAULT '0',
+  `mapid` int(8) unsigned NOT NULL DEFAULT '0',
+  `time` int(10) unsigned NOT NULL DEFAULT '0',
+  `team1` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `team2` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `tickets1` int(10) unsigned NOT NULL DEFAULT '0',
+  `tickets2` int(10) unsigned NOT NULL DEFAULT '0',
+  `pids1` int(10) unsigned NOT NULL DEFAULT '0',
+  `pids1_end` int(10) unsigned NOT NULL DEFAULT '0',
+  `pids2` int(10) unsigned NOT NULL DEFAULT '0',
+  `pids2_end` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`),
+  KEY `timestamp` (`timestamp`),
+  KEY `mapid` (`mapid`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+
+
+-- bf2142stats_dev.maps source
+
+create or replace
+algorithm = UNDEFINED view `maps` as
+select
+    `stats_m`.`pid` as `id`,
+    `stats_m`.`mapid` as `mapid`,
+    max(`stats_m`.`mbr`) as `best`,
+    max(0) as `worst`,
+    sum(`stats_m`.`mwin`) as `win`,
+    sum(`stats_m`.`mlos`) as `loss`,
+    sum(`stats_m`.`mtt`) as `time`
+from
+    `stats_m`
+group by
+    `stats_m`.`pid`;
+
+
+-- bf2142stats_dev.player source
+
+create or replace
+algorithm = UNDEFINED view `player` as
+select
+    `pp`.`pid` as `id`,
+    `pp`.`rnk` as `rank`,
+    `sa`.`country` as `country`,
+    `pp`.`nick` as `name`,
+    `pp`.`tt` as `time`,
+    `pp`.`spm` as `spm`,
+    `pp`.`kdr` as `kdr`,
+    `pp`.`resp` as `ammos`,
+    `pp`.`unavl` as `availunlocks`,
+    `pp`.`ban` as `banned`,
+    `pp`.`capa` as `captureassits`,
+    `pp`.`captures` as `captures`,
+    '0' as `chng`,
+    '' as `clantag`,
+    `pp`.`cs` as `cmdscore`,
+    `pp`.`tac` as `cmdtime`,
+    `pp`.`klla` as `damageassists`,
+    `pp`.`dths` as `deaths`,
+    `pp`.`dstrk` as `deathstreak`,
+    '0' as `decr`,
+    `pp`.`dcpt` as `defends`,
+    `pp`.`dass` as `driverassists`,
+    '0' as `driverspecials`,
+    `pp`.`hls` as `heals`,
+    '0' as `hidden`,
+    `sa`.`ip` as `ip`,
+    '0' as `isbot`,
+    '0' as `joined`,
+    `pp`.`kick` as `kicked`,
+    `pp`.`klls` as `kills`,
+    `pp`.`klstrk` as `killstreak`,
+    '0' as `lastonline`,
+    `pp`.`los` as `losses`,
+    `pp`.`talw` as `lwtime`,
+    '0' as `mode0`,
+    '0' as `mode1`,
+    '0' as `mode2`,
+    '0' as `neutralizeassits`,
+    `pp`.`ncpt` as `neutralizes`,
+    '0' as `passengerassists`,
+    '0' as `permban`,
+    `pp`.`rps` as `repairs`,
+    `pp`.`rvs` as `revives`,
+    `pp`.`brs` as `rndscore`,
+    (
+    select
+        sum((`sm`.`mwin` + `sm`.`mlos`))
+    from
+        `stats_m` `sm`
+    where
+        (`sm`.`pid` = `pp`.`pid`)) as `rounds`,
+    `pp`.`gsco` as `score`,
+    '0' as `skillscore`,
+    `pp`.`tasl` as `sqltime`,
+    `pp`.`tasm` as `sqmtime`,
+    `pp`.`suic` as `suicides`,
+    '0' as `targetassists`,
+    `pp`.`tdmg` as `teamdamage`,
+    `pp`.`tkls` as `teamkills`,
+    `pp`.`twsc` as `teamscore`,
+    `pp`.`tvdmg` as `teamvehicledamage`,
+    `pp`.`unlc` as `usedunlocks`,
+    `pp`.`wins` as `wins`,
+    `pp`.`fe` as `fe`,
+    `pp`.`fgm` as `fgm`,
+    `pp`.`fk` as `fk`,
+    `pp`.`fm` as `fm`,
+    `pp`.`fv` as `fv`,
+    `pp`.`fw` as `fw`
+from
+    `playerprogress` `pp`
+left join `subaccount` `sa` on
+    (`pp`.`pid` = `sa`.`id`);
+
+
+
+-- bf2142stats_dev.kits source
+
+create or replace
+algorithm = UNDEFINED view `kits` as
+select
+    `p`.`pid` as `id`,
+    `p`.`ktt-0` as `time0`,
+    `p`.`kkls-0` as `kills0`,
+    `p`.`kdths-0` as `deaths0`,
+    `p`.`ktt-1` as `time1`,
+    `p`.`kkls-1` as `kills1`,
+    `p`.`kdths-1` as `deaths1`,
+    `p`.`ktt-2` as `time2`,
+    `p`.`kkls-2` as `kills2`,
+    `p`.`kdths-2` as `deaths2`,
+    `p`.`ktt-3` as `time3`,
+    `p`.`kkls-3` as `kills3`,
+    `p`.`kdths-3` as `deaths3`
+from
+    `playerprogress` `p`;
