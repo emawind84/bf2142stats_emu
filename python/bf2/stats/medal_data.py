@@ -677,6 +677,31 @@ medal_data = (
 								player_score ('titanCoreDestroyed', 1),
 								f_plus(	global_stat ('tcd'),
 									global_stat ('tcrd'), 40)), 1000),
+
+			# Arctic Combat Badge
+			# 6 Kills playing Northern Strike in a Round
+			# ('120_1', 'acb', LIMIT_SINGLE, ),
+
+			# 10 Kills playing Northern Strike in a Round
+			# 02:00 Hours Playing Northern Strike
+			# ('120_2', 'acb', LIMIT_SINGLE, ),
+
+			# 14 Kills playing Northern Strike in a Round
+			# 05:00 Hours Playing Northern Strike
+			# ('120_3', 'acb', LIMIT_SINGLE, ),
+
+			# Vehicle Excellence Badge Bronze
+			# 5 Minutes in a Northern Strike Vehicle in a Round
+			# ('121_1', 'veb', LIMIT_SINGLE, ),
+
+			# 8 Kills with Northern Strike Vehicles in a Round
+			# 01:00 Hours in Northern Strike Vehicles
+			# ('121_2', 'veb', LIMIT_SINGLE, ),
+
+			# 12 Kills with Northern Strike Vehicles in a Round
+			# 04:00 Hours in Northern Strike Vehicles
+			# ('121_3', 'veb', LIMIT_SINGLE, ),
+
 		#Ribbons
 
 			#Air Defense Ribbon
