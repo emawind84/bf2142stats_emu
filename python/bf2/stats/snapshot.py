@@ -173,12 +173,19 @@ def cleanoutMedalsVector():
 		del medalMap[pid]
 #
 def getSnapShot():
-	print "snapshot.py: Assembling snapshot"
-	#snapShot = "\\"
+	print "Assembling snapshot"
+	
 	global map_start
-	snapShot = snapshot_prefix + "\\" + bf2.gameLogic.getMapName() + "\\"
-	snapShot += "mapstart\\" + str(map_start) + "\\mapend\\" + str(time()) + "\\"
-	snapShot += "win\\" + str(bf2.gameLogic.getWinner()) + "\\"
+	snapShot = snapshot_prefix + '\\' + str(bf2.serverSettings.getServerConfig('sv.serverName')) + '\\'
+	snapShot += 'gameport\\' + str(bf2.serverSettings.getServerConfig('sv.serverPort')) + '\\'
+	snapShot += 'queryport\\' + str(bf2.serverSettings.getServerConfig('sv.gameSpyPort')) + '\\'
+	snapShot += 'mapname\\' + str(bf2.gameLogic.getMapName()) + '\\'
+	snapShot += 'mapid\\' + str(getMapId(bf2.serverSettings.getMapName())) + '\\'
+	snapShot += 'mapstart\\' + str(map_start) + '\\mapend\\' + str(time()) + '\\'
+	snapShot += 'win\\' + str(bf2.gameLogic.getWinner()) + '\\'
+	
+	if g_debug: print 'Finished Pre-Compile SNAPSHOT'
+
 	statsMap = getStatsMap()
 	
 	# ----------------------------------------------------------------------------
@@ -207,21 +214,34 @@ def getSnapShot():
 	winner = bf2.gameLogic.getWinner()
 	if winner != 0:
 		standardKeys += [("rwa", roundArmies[winner])]
+
+	# get final ticket score
+	if g_debug: print "Army 1 (%s) Score: %s" % (str(roundArmies[1]), str(bf2.gameLogic.getTickets(1)))
+	if g_debug: print "Army 2 (%s) Score: %s" % (str(roundArmies[2]), str(bf2.gameLogic.getTickets(2)))
+	standardKeys += [
+		("ra1", str(roundArmies[1])),
+		("rs1", str(bf2.gameLogic.getTickets(1))),
+		("ra2", str(roundArmies[2])),
+		("rs2", str(bf2.gameLogic.getTickets(2))),
+	]
+
 	stdKeyVals = []
 	for k in standardKeys:
 		stdKeyVals.append ("\\".join((k[0], str(k[1]))))
+
 	snapShot += "\\".join(stdKeyVals)
-	
-	if g_debug: print "snapshot.py: Snapshot Pre-processing complete: %s" % (str(snapShot))
+
+	if g_debug: print 'Snapshot Pre-processing complete: %s' % (str(snapShot))
 	
 	playerSnapShots = ""
-	if g_debug: print "snapshot.py: Num clients to base snap on: %d" % (len(statsMap))
+	if g_debug: print 'Num clients to base snap on: %d' % (len(statsMap))
 	for sp in statsMap.itervalues():
-		if g_debug: print "snapshot.py: Processing PID: %s" % (str(sp.profileId))
-		playerSnapShot = getPlayerSnapshot(sp)
-		playerSnapShots += playerSnapShot
-	snapShot += playerSnapShots
+		if g_debug: print 'Processing PID: %s' % (str(sp.profileId))
+		playerSnapShots += getPlayerSnapshot(sp)
 
+	print "Doing Player SNAPSHOTS"
+	snapShot += playerSnapShots
+	
 	# Add EOF marker for validation
 	snapShot += "\\EOF\\1"
 	
@@ -242,7 +262,7 @@ def getPlayerSnapshot(playerStat):
 		("tt",		int(playerStat.timePlayed)							),	#+ => Time Played
 		("c",		playerStat.complete									),
 		("ip",		playerStat.ipaddr									),
-		#("ai",		playerStat.isAIPlayer								),
+		("ai",		playerStat.isAIPlayer								),
 
 		("ban",		playerStat.timesBanned								),	#+ => total bans na server
 		("capa",	playerStat.localScore.cpAssists						),	#+ => Capture Assists

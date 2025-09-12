@@ -137,6 +137,7 @@ class PlayerStat:
 		self.profileId = player.getProfileId()
 		self.playerId = player.index
 		self.id = self.playerId
+		self.isAIPlayer = player.isAIPlayer()
 		self.connectionOrderNr = 0
 		self.rank = 0
 		self.roundRankup = 0

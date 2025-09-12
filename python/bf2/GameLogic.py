@@ -70,6 +70,9 @@ class ServerSettings:
 	def getUseGlobalUnlocks(self): return host.ss_getParam('globUnlocks')
 	
 	def getMaxRank(self): return host.ss_getParam('maxRank')
+
+	def getServerConfig(self, variableName):
+		return host.rcon_invoke(variableName).strip()
 	
 class GameServer:
 	def __init__(self):
