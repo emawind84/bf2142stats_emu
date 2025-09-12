@@ -90,7 +90,7 @@ switch ($mode) {
 		$query1 = "SELECT a._lgdt AS date,(a._gsco+a._crpt) AS points, a._gsco AS globalscore,a._crpt AS experiencepoints, awaybonus 
                     FROM `stats_a` a
                     LEFT JOIN playerprogress p ON p.pid = a.pid
-                    WHERE a.pid='".$authPID."' ORDER BY a._date DESC";                
+                    WHERE a.pid='".$authPID."' ORDER BY a._lgdt DESC";                
 	break;
 	case "score":
 		$query1 = "SELECT _lgdt AS date, _gsco AS score FROM `stats_a` WHERE pid='".$authPID."'";
