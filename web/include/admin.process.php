@@ -173,7 +173,7 @@ function processClearDB() {
 	global $cfg;
 	$connection = @mysql_connect($cfg->get('db_host'), $cfg->get('db_user'), $cfg->get('db_pass'));
 	@mysql_select_db($cfg->get('db_name'), $connection) or die("Database Error: " . mysql_error());
-	$tables = array('awards','mapinfo','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks','playerprogress');
+	$tables = array('awards','mapinfo','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks','playerprogress','round_history');
 	foreach ($tables as $table) {
 		$query1 = 'TRUNCATE TABLE `'.$table.'`;';
 		$result1 = mysql_query($query1);

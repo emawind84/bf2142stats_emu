@@ -470,6 +470,28 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 
                 $data2 = mysql_fetch_assoc($result1);
 
+                /********************************
+                * Process 'Army'
+                ********************************/
+                ErrorLog("Processing Army Data (".$data["pid_$x"].")",3);
+                $army = $data["a_$x"];
+                
+                // Count Players in Team
+                if($army == $data["ra1"]) 
+                {	
+                    // Team 1 Player
+                    $globals['team1_pids']++;
+                    if($data["c_$x"]) 
+                        $globals['team1_pids_end']++;
+                }
+                if($army == $data["ra2"]) 
+                {	
+                    // Team 2 Player
+                    $globals['team2_pids']++;
+                    if($data["c_$x"]) 
+                        $globals['team2_pids_end']++;
+                }
+
                 //AND m.gm=".$data["gm"]." AND m.mapid=".$data["m"]." 
                 $query = "SELECT * from stats_m m WHERE m.pid = " . $data["pid_$x"] . " AND m.gm=" . $data["gm"] . " AND m.mapid=" . $data["m"] . " LIMIT 1";
                 $res = mysql_query($query);
@@ -488,27 +510,6 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 } else {
                     $complete = 0;
                 }
-
-                //gsco	Global Score --- for rankup and disconnect
-                //awybt	--- for rankup and disconnect
-                //bnspt	for rankup and disconnect
-                //expts	for rankup and disconnect
-                //akl	???
-                //avcred	???
-                //bp-1	???
-                //ent	???
-                //ent-1	???
-                //ent-2	???
-                //ent-3	???
-                //hkl	???
-                //klsk	???
-                //md	???
-                //sasl	???
-                //tid	???
-                //unavl	???
-                //unlc	???
-                //vet	???
-                //date               
 
                 $query3a .= " `_date`='" . $mapdate . "',";
                 $query3m .= " `gm`=" . $data['gm'] . ", `mapid`=" . $data['m'] . ",";
@@ -1006,8 +1007,8 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 $query3a .= " `_ovaccu`='" . (($data2["_toth"] + $data["toth_$x"]) / chz(($data2["_tots"] + $data["tots_$x"]))) . "',";
 
                 //lgdt Time of last game
-                $query3p .= " `lgdt`='" . intval($data["mapend"]) . "',";
-                $query3a .= " `_lgdt`='" . intval($data["mapend"]) . "',";
+                $query3p .= " `lgdt`='" . intval($data["mapstart"]) . "',";
+                $query3a .= " `_lgdt`='" . intval($data["mapstart"]) . "',";
 
                 //--------------------------------------------------------------------------------------------------------------------
                 $w_array = array("wdths", "wkls", "wtp", "wbf", "wbh"); // "waccu-",
@@ -1254,6 +1255,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
         }
         ErrorLog("End Loop $x", 3);
     }
+
     /*     * ******************************
      * Process 'Awards'
      * ****************************** */
@@ -1282,7 +1284,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
             // Check if Player already has Award
             //if($atype == 1) { $qbage = " AND alvl = ".$alvl.""; } else { $qbage = ""; }
             $query = "SELECT * FROM awards WHERE pid = " . $awpid . " AND atype = " . $atype . " AND aid = " . $aid . " " . $qbage;
-         //   echo "<br />".$query;
+
             $awdresult = mysql_query($query);
             checkSQLResult($awdresult, $query);
             $num_rows = mysql_num_rows($awdresult);
@@ -1293,7 +1295,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
             } else {
                 $qlvl = "";
             }
-          // echo "<br/><br/>".$awardsdata['Cep'][1].'<br/><br/>';
+
             if ($awardsdata[$paward_name][1] == 1) {
              //   echo "[".$atype.$aid.$alvl."=>".$awardsdata[$paward_name][1]."] ".$paward_name."<br/>";
                 // NEW multiple or UPDATE multiple//
@@ -1302,24 +1304,30 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 } else {
                     $query = "INSERT INTO awards SET pid = " . $awpid . ", atype = " . $atype . ", aid = " . $aid . ", earned = " . time() . ", first = " . time() . "" . $qlvl;
                 }
-            //    echo '<br/>'.$query;
+                if ($allow_db_changes) 
+                {
+                    $result = mysql_query($query);
+                    checkSQLResult($result, $query);
+                }
+            } 
+            elseif ($awardsdata[$paward_name][1] == 0) 
+            {
+                //echo "<br/>---[".$atype.$aid.$alvl."=>".$awardsdata[$paward_name][1]."] ".$paward_name."<br/>";
+                if ($num_rows == 0) {
+                    $query = "INSERT INTO awards SET pid = " . $awpid . ", atype = " . $atype . ", aid = " . $aid . ", earned = " . time() . ", first = " . time() . "" . $qlvl;
+                }
+                else
+                {
+                    if ($atype == 1)
+                        $query = "UPDATE awards SET alvl=".$alvl.", earned = " . time() . " WHERE pid = " . $awpid . " AND atype = " . $atype . " AND aid = " . $aid . "";
+                    else
+                        $query = "";
+                }
                 if ($allow_db_changes)
-                    $result = mysql_query($query); else if ($allow_db_show)
-    //                echo '<br />' . $query . '<br />===<br />';
-                checkSQLResult($result, $query);
-            } elseif ($awardsdata[$paward_name][1] == 0) {
-			//echo "<br/>---[".$atype.$aid.$alvl."=>".$awardsdata[$paward_name][1]."] ".$paward_name."<br/>";
-            if ($num_rows == 0) {
-	            	$query = "INSERT INTO awards SET pid = " . $awpid . ", atype = " . $atype . ", aid = " . $aid . ", earned = " . time() . ", first = " . time() . "" . $qlvl;
-            	} else {
-            	if ($atype == 1)
-                    $query = "UPDATE awards SET alvl=".$alvl.", earned = " . time() . " WHERE pid = " . $awpid . " AND atype = " . $atype . " AND aid = " . $aid . "";
-                    else $query = "";
-            	}
-           	 if ($allow_db_changes)
-                   $result = mysql_query($query) or die(mysql_error()); else if ($allow_db_show)
-             //      echo '<br />' . $query . '<br />===<br />';
-               checkSQLResult($result, $query);
+                {
+                    $result = mysql_query($query) or die(mysql_error());
+                    checkSQLResult($result, $query);
+                }
             }
         }
     }
@@ -1401,43 +1409,29 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
         checkSQLResult($result, $query);
     }
 
-    /*     * ******************************
-     * Process 'RoundInfo'
-     * ****************************** */
-    /*
-      ErrorLog("Processing Round History Data",3);
-      $query = "INSERT INTO round_history SET
-      `timestamp` = {$data[mapstart]},
-      `mapid` = {$mapid},
-      `time` = {$globals[roundtime]},
-      `team1` = {$data[ra1]},
-      `team2` = {$data[ra2]},
-      `tickets1` = {$data[rs1]},
-      `tickets2` = {$data[rs2]},
-      `pids1` = {$globals[team1_pids]},
-      `pids1_end` = {$globals[team1_pids_end]},
-      `pids2` = {$globals[team2_pids]},
-      `pids2_end` = {$globals[team2_pids_end]}
-      ";
-      if ($allow_db_changes) $result = mysql_query($query); else if ($allow_db_show) echo '<br />'.$query.'<br />===<br />';
-      checkSQLResult ($result, $query);
-     */
-    /*     * ******************************
-     * Process 'SMoC/GEN'
-     * ****************************** */
-    /*
-      omero, 2006-04-15
-      do check for SMOC and General Ranks,
-      only for non-AI players
-     */
-    /*
-      ErrorLog("Processing SMOC and General Ranks",3);
-      smocCheck();
-      genCheck();
-     */
-    /*     * ******************************
-     * Process 'Archive Data File'
-     * ****************************** */
+    /********************************
+	* Process 'RoundInfo'
+	********************************/
+	ErrorLog("Processing Round History Data",3);
+	$query = "INSERT INTO round_history SET
+		`timestamp` = {$data['mapstart']},
+		`mapid` = {$mapid},
+		`time` = {$globals['roundtime']},
+		`team1` = " . ($data['ra1']?:99) . ",
+		`team2` = " . ($data['ra2']?:99) . ",
+		`tickets1` = " . ($data['rs1']?:0) . ",
+		`tickets2` = " . ($data['rs2']?:0) . ",
+		`pids1` = {$globals['team1_pids']},
+		`pids1_end` = {$globals['team1_pids_end']},
+		`pids2` = {$globals['team2_pids']},
+		`pids2_end` = {$globals['team2_pids_end']}		
+	";
+    $result = mysql_query($query);
+    checkSQLResult($result, $query);
+
+    /********************************
+	* Process 'Archive Data File'
+	********************************/
     if ($cfg->get('stats_move_logs')) {
         $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
         $fn_dest = SNAPSHOT_STORE_PATH . DS . $ip_s . DS . $stats_filename;
