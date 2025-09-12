@@ -771,7 +771,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 $losses = $data2['los'];
                 $pWin = false;
                 if ($data["c_$x"]) {
-                    if ($data['wins'] == $data["t_$x"]) {
+                    if ($data['win'] == $data["t_$x"]) {
                         $query3p .= " `wins`=(`wins`+1),";
                         $query3a .= " `_wins`=(`_wins`+1),";
                         $wins++;
@@ -1087,7 +1087,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                     if (!mysql_num_rows($res)) {
                         $query = "INSERT INTO stats_m SET " . rtrim($query3m, ",") . ", `pid`='" . $data["pid_$x"] . "'";
                     } else {
-                        $query = "UPDATE stats_m SET " . rtrim($query3m, ",") . " WHERE `pid`='" . $data["pid_$x"] . "' AND gm='" . $data["gm"] . "'";
+                        $query = "UPDATE stats_m SET " . rtrim($query3m, ",") . " WHERE `pid`='" . $data["pid_$x"] . "' AND gm='" . $data["gm"] . "' AND mapid=" . $data["m"];
                     }
                     $res = mysql_query($query);
                     checkSQLResult($res, $query);
