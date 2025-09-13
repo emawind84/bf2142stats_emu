@@ -8,6 +8,8 @@ ob_start();
 | Define Constants
 | ---------------------------------------------------------------
 */
+define('CODE_VER', '1.10.1');
+define('CODE_VER_DATE', '2025-09-12');
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__));
 define('SYSTEM_PATH', ROOT . DS . 'system');
@@ -69,6 +71,9 @@ require(SYSTEM_PATH . DS . 'functions.php');
 
 $cfg = new Config();
 DEFINE("_ERR_RESPONSE", "E\nH\tresponse\nD\t<font color=\"red\">ERROR</font>: ");
+
+// Define our database version!
+define('DB_VER', getDbVer());
 
 /*
 | ---------------------------------------------------------------
@@ -260,6 +265,7 @@ if (isset($data["gm"])) {
     //     $data["gm"] = 0;
     // }
 }
+
 
 /********************************
 * Process 'Server'

@@ -3,7 +3,7 @@
 $sqldata = array();
 
 // Load Version Data
-$sqldata[] = array('Version Data', "INSERT INTO `_version` VALUES ('".$cfg->get('db_expected_ver')."', ".time().");");
+$sqldata[] = array('Version Data', "INSERT INTO `_version` VALUES ('". CODE_VER ."', ".time().");");
 
 // Load IP Nations Data
 DEFINE('_IPN', 'IP 2 Nation Data');

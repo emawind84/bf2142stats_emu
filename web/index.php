@@ -9,6 +9,8 @@ ob_start();
 | ---------------------------------------------------------------
 */
 define('_BF2142_ADMIN', '1');
+define('CODE_VER', '1.10.1');
+define('CODE_VER_DATE', '2025-09-12');
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__) . DS);
 define('SYSTEM_PATH', ROOT . DS . 'system');
@@ -66,24 +68,21 @@ require(SYSTEM_PATH . DS . 'functions.php');
 
 $cfg = new Config();
 
-// Open database connection
-$connection = @mysql_connect($db_host, $db_user, $db_pass);
-@mysql_select_db($db_name, $connection);
+// Define our database version!
+define('DB_VER', getDbVer());
 
-
-// Check Database Version
-$dbver = getDbVer();
-error_log(">>> DB VERSION: {$dbver}, expected: {$cfg->get('db_expected_ver')}");
-
-if ($dbver != $cfg->get('db_expected_ver')) {
-	$errmsg = "Database version expected: ".$cfg->get('db_expected_ver').", Found: {$dbver}";
-	ErrorLog($errmsg, 1);
-	die("<font color='red'>ERROR:</font> {$errmsg}");
-} else {
-	$errmsg = "Database version expected: ".$cfg->get('db_expected_ver').", Found: {$dbver}";
-	ErrorLog($errmsg, 3);
+// Check Database Version... this is rather important!
+if(DB_VER != CODE_VER)
+{
+    $errmsg = "Database version expected: ". CODE_VER .", Found: ". DB_VER;
+    ErrorLog($errmsg, 1);
+    die("<font color='red'>ERROR:</font> {$errmsg}");
+} 
+else 
+{
+    $errmsg = "Database version expected: ". CODE_VER .", Found: ". DB_VER;
+    ErrorLog($errmsg, 3);
 }
-@mysql_close($connection);
 
 // Register AutoLoader
 AutoLoader::Register();

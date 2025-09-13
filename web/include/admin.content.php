@@ -211,7 +211,6 @@ function showConfigForm() {
 		<input type="hidden" name="action" value="process">
 		<input type="hidden" name="task" value="saveconfig">
 		<input type="hidden" name="ext_ip" value="<?php echo get_ext_ip(); ?>">
-		<input type="hidden" name="cfg__db_expected_ver" value="<?php echo $cfg->get('db_expected_ver'); ?>">
 		
 		<table border="0" width="95%" style="border: 2px solid #808080;">
 			<tr>

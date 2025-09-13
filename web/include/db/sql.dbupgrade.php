@@ -11,9 +11,6 @@ $sqlupgrade[] = array('Create Version Table', '1.4.0',
 		PRIMARY KEY  (`dbver`),
 		KEY `dbver` (`dbver`)
 	) TYPE=MyISAM;");
-
-$sqlupgrade[] = array('Clear Version Table', $cfg->get('db_expected_ver'),
-	"DELETE FROM `_version`;");
 	
 $sqlupgrade[] = array('Alter Army Table', '1.3.0',
 	"ALTER TABLE  `army`
@@ -112,8 +109,12 @@ $sqlupgrade[] = array('Create Round History Table', '1.4.0',
 		KEY `timestamp` (`timestamp`),
 		KEY `mapid` (`mapid`)
 	) TYPE=MyISAM;");
+
+
+$sqlupgrade[] = array('Add ranked column to servers table', '1.11.0',
+	"ALTER TABLE servers ADD ranked TINYINT DEFAULT 0 NOT NULL;");
 	
-$sqlupgrade[] = array('Update Version Table', $cfg->get('db_expected_ver'),
-	"INSERT INTO `_version` VALUES ('".$cfg->get('db_expected_ver')."', ".time().");");
+$sqlupgrade[] = array('Update Version Table', CODE_VER,
+	"INSERT INTO `_version` VALUES ('". CODE_VER ."', ".time().");");
 
 ?>

@@ -1,6 +1,5 @@
 <?php
 
-DEFINE('_CODE_VER', '1.10.1');
 define('CONFIG_FILE', ROOT . DS . 'include' . DS . '_ccconfig.php');
 
 //We check each ip in the array and return response
@@ -99,11 +98,6 @@ class Config {
 
     function Config() {
         $this->Load();
-
-        // Verify Code Version
-        if ($this->data['db_expected_ver'] != _CODE_VER) {
-            $this->data['db_expected_ver'] = _CODE_VER;
-        }
     }
 
     function Save() {

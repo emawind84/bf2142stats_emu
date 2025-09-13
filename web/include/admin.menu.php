@@ -4,7 +4,7 @@
 defined( '_BF2142_ADMIN' ) or die( 'Restricted access' );
 
 // Check DB Version
-if ($cfg->get('db_expected_ver') == $dbver) {
+if (CODE_VER == DB_VER) {
 	$dbver_txt = "Upgrade DB";
 } else {
 	$dbver_txt = "<font color=\"red\"><b>Upgrade DB</b></font>";
@@ -18,12 +18,12 @@ if (!checkSession()) {
 		<li><a href="?task=login">Login</a></li>
 	</ul>
 <?php
-} elseif ($cfg->get('db_expected_ver') != $dbver) {
+} elseif (CODE_VER != DB_VER) {
 ?>
 	<div class="main-menu">
 		<b>Database Manager</b></div>
 	<ul class="sub-menu"><?php
-		if ($dbver == '0.0.0') {?>
+		if (DB_VER == '0.0.0') {?>
 		<li><a href="?task=installdb"><font color=\"red\"><b>Install DB</b></font></a></li>
 		<li><a href="?task=upgradedb">Upgrade DB</a></li><?php
 		} else {?>
@@ -47,10 +47,10 @@ if (!checkSession()) {
 	<div class="main-menu">
 		<b>Database Manager</b></div>
 	<ul class="sub-menu"><?php
-	if ($cfg->get('db_expected_ver') == $dbver) {?>
+	if (CODE_VER == DB_VER) {?>
 		<li><a href="?task=installdb">Install DB</a></li>
 		<li><a href="?task=upgradedb">Upgrade DB</a></li><?php
-	} elseif ($dbver == '0.0.0') {?>
+	} elseif (DB_VER == '0.0.0') {?>
 		<li><a href="?task=installdb"><font color=\"red\"><b>Install DB</b></font></a></li>
 		<li><a href="?task=upgradedb">Upgrade DB</a></li><?php
 	} else {?>

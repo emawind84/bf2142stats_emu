@@ -6,7 +6,6 @@
 * this file. Please use the Web Admin  *
 * to change values.                    *
 ***************************************/
-$db_expected_ver = '1.10.1';
 $db_host = 'localhost';
 $db_name = 'bf2142stats';
 $db_user = 'bf2142stats';
