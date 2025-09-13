@@ -70,6 +70,17 @@ require(SYSTEM_PATH . DS . 'functions.php');
 $cfg = new Config();
 DEFINE("_ERR_RESPONSE", "E\nH\tresponse\nD\t<font color=\"red\">ERROR</font>: ");
 
+/*
+| ---------------------------------------------------------------
+| Security Check
+| ---------------------------------------------------------------
+*/
+if(!isIPInNetArray(Auth::ClientIp(), $cfg->get('game_hosts')))
+{
+    ErrorLog("Unauthorised Access Attempted! (IP: " . Auth::ClientIp() . ")", 0);
+    die(_ERR_RESPONSE . "Unauthorised Gameserver");
+}
+
 // Get URL POST data
 $rawdata = file_get_contents('php://input');
 //$rawdata = file_get_contents('data.txt');
@@ -94,7 +105,7 @@ if ($rawdata) {
 
 // Make key/value pairs
 $prefix = $gooddata[0];
-$mapname = strtolower($gooddata[1]);
+$servername = $gooddata[1];
 $badtime = false;
 for ($x = 2; $x < count($gooddata); $x += 2) {
     if ($gooddata[$x + 1] >= 184467440000) {
@@ -111,16 +122,17 @@ if ($LOG) {
     fflush($fp);
     fclose($fp);
 }
+
 // Import Backend Awards Data
 require('include/data.awards.php');
 $awardsdata = buildAwardsData($data['v']);
-//print_r($awardsdata);
-//$backendawardsdata = buildBackendAwardsData($data['v']);
+
 // Generate SNAPSHOT Filename
 //GMT +2:00
 $offset = 2 * 60 * 60; //converting 2 hours to seconds.
 $dateFormat = "d-m-Y";
 
+$mapname = strtolower($data['mapname']);
 $mapdate = gmdate('Ymd_Hi', (int) $data['mapstart'] + $offset);
 $currentDate = gmdate('Ymd', (int) $data['mapstart'] + $offset);
 $currdate = gmdate("Y-m-d", time() + $offset);
@@ -154,44 +166,14 @@ else
 if (!is_dir(SNAPSHOT_BAD_PATH. DS)) {
     mkdir(SNAPSHOT_BAD_PATH, 0777);
 }
-if (!is_dir(SNAPSHOT_BAD_PATH . DS . "BADTIME")) {
-    mkdir(SNAPSHOT_BAD_PATH . DS . "BADTIME", 0777);
-}
 if (!is_dir(SNAPSHOT_BAD_PATH . DS . "EOF")) {
     mkdir(SNAPSHOT_BAD_PATH . DS . "EOF", 0777);
-}
-if (!is_dir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH")) {
-    mkdir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH", 0777);
 }
 if (!is_dir(SNAPSHOT_BAD_PATH . DS . "GAMEMOD")) {
     mkdir(SNAPSHOT_BAD_PATH . DS . "GAMEMOD", 0777);
 }
 
 // Check for Complete Snapshot data
-//print_r($data);
-// Check remote host is authorised (simple security check)
-if (!isIPInNetArray(Auth::ClientIp(), $cfg->get('game_hosts'))) {
-    $errmsg = "Unauthorised Access Attempted! (IP: " . Auth::ClientIp() . ")";
-    ErrorLog($errmsg, 0);
-    $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
-    if (!is_dir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH" . DS . $ip_s)) mkdir(SNAPSHOT_BAD_PATH . DS . "NOTAUTH" . DS . $ip_s, 0777);
-    $fn_dest = SNAPSHOT_BAD_PATH . DS . "NOTAUTH" . DS . $ip_s . DS . $stats_filename;
-    if (file_exists($fn_src)) {
-        if (file_exists($fn_dest)) {
-            $errmsg = "SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})";
-            ErrorLog($errmsg, 2);
-        }
-        copy($fn_src, $fn_dest);
-        // Remove the original ONLY if it copies
-        if (file_exists($fn_dest)) {
-            unlink($fn_src);
-        }
-    }
-    $errmsg = "SNAPSHOT Data File Moved! ({$fn_src} -> {$fn_dest})";
-    ErrorLog($errmsg, 3);
-    die(_ERR_RESPONSE . $errmsg);
-}
-
 if ($badtime) {
     $errmsg = "SNAPSHOT Data has badtime!";
     ErrorLog($errmsg, 1);
@@ -237,30 +219,6 @@ if ($data['EOF'] != 1) {
     die(_ERR_RESPONSE . $errmsg);
 }
 
-//if ($data["gm"] > 2 OR $data["gm"] < 0) {
-if (0) {
-    $errmsg = "SNAPSHOT Data NOT True GameMod!";
-    ErrorLog($errmsg, 1);
-    $fn_src = SNAPSHOT_TEMP_PATH . DS . $stats_filename;
-    if (!is_dir(SNAPSHOT_BAD_PATH . DS . "GAMEMODE" . DS . $ip_s)) {
-        mkdir(SNAPSHOT_BAD_PATH . DS . "GAMEMODE" . DS . $ip_s, 0777);
-    }
-    $fn_dest = SNAPSHOT_BAD_PATH . DS . "GAMEMODE" . DS . $ip_s . DS . $stats_filename;
-    if (file_exists($fn_src)) {
-        if (file_exists($fn_dest)) {
-            $errmsg = "SNAPSHOT Data File Already Exists, Over-writing! ({$fn_src} -> {$fn_dest})";
-            ErrorLog($errmsg, 2);
-        }
-        copy($fn_src, $fn_dest);
-        // Remove the original ONLY if it copies
-        if (file_exists($fn_dest)) {
-            unlink($fn_src);
-        }
-    }
-    die(_ERR_RESPONSE . $errmsg);
-}
-
-
 
 
 // SNAPSHOT Data OK
@@ -303,19 +261,52 @@ if (isset($data["gm"])) {
     // }
 }
 
-//Sinth Comment
-//if (isset($data["gm"]) AND $data["gm"] > 1) {
-//    $data["gm"] = 0;
-//}
-// Check if this is a Central DB Snapshot update
-/*
-  if (isset($data["cdb_update"])) {
-  $centralupdate = $data["cdb_update"];
-  ErrorLog("Central SNAPSHOT Update Type: $centralupdate",3);
-  } else {
-  $centralupdate = 0;
-  }
- */
+/********************************
+* Process 'Server'
+********************************/
+$gamesrv_ip = Auth::ClientIp();
+ErrorLog("Processing Game Server IP:{$gamesrv_ip}, prefix:{$prefix}", 3);
+
+// Get our server's game port and Queryport
+$gamesrv_port = (isset($data['gameport'])) ? intval($data['gameport']) : 16567;
+$gamesrv_qryport = (isset($data['queryport'])) ? intval($data['queryport']) : 29900;
+$query = "SELECT `id`, `ranked` FROM `servers` WHERE `ip` = '".  $gamesrv_ip ."' AND `prefix` = '". $prefix . "'";
+$result = mysql_query($query);
+checkSQLResult($result, $query);
+$gamesrv = mysql_fetch_assoc($result);
+if (!mysql_num_rows($result))
+{
+    // $query = "INSERT INTO `servers` SET ".
+    //     "`ip` = '{$gamesrv_ip}', ".
+    //     "`name` = '{$servername}', ".
+    //     "`prefix` = '{$prefix}', ".
+    //     "`port` = '{$gamesrv_port}', ".
+    //     "`queryport` = {$gamesrv_qryport}, ".
+    //     "`lastupdate` = NOW() ";
+    // $result = mysql_query($query);
+    // checkSQLResult($result, $query);
+    $errmsg = " - Server not found! Snapshot will not be processed.";
+    ErrorLog($errmsg, 3);
+    die(_ERR_RESPONSE . $errmsg);
+} 
+else if ($gamesrv['ranked'])
+{
+    $query = "UPDATE `servers` SET ".
+        "`name` = '{$servername}', ".
+        "`port` = '{$gamesrv_port}', ".
+        "`queryport` = {$gamesrv_qryport}, ".
+        "`lastupdate` = NOW() ".
+        "WHERE ip = '{$gamesrv_ip}' AND prefix = '{$prefix}'";
+    $result = mysql_query($query);
+    checkSQLResult($result, $query);
+}
+else
+{
+    $errmsg = " - Server not ranked! Snapshot will not be processed.";
+    ErrorLog($errmsg, 3);
+    die(_ERR_RESPONSE . $errmsg);
+}
+
 // Minimum player & time check
 if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $cfg->get('stats_min_game_time')) {
 
@@ -1331,50 +1322,10 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
             }
         }
     }
-
-
-
-    /*     * ******************************
-     * Process 'Server'
-     * ****************************** */
-    // Note: Code borrowed from release by ArmEagle (armeagle@gmail.com)
-    /*
-      $gamesrv_ip   = $_SERVER['REMOTE_ADDR'];
-      $gamesrv_name = $_SERVER['REMOTE_HOST'];
-      ErrorLog("Processing Game Server: {$gamesrv_ip}",3);
-      $gamesrv_port = ($data['gameport']) ? $data['gameport'] : 16567;	//Set to Default if no data
-      $gamesrv_queryport = ($data['queryport']) ? $data['queryport'] : 29900;	//Set to Default if no data
-      $query = "SELECT * FROM servers WHERE ip = '{$gamesrv_ip}' AND prefix = '{$prefix}'";
-      $result = mysql_query($query);
-      checkSQLResult ($result, $query);
-      if (!mysql_num_rows($result)) {
-      $query = "INSERT INTO servers SET ".
-      "ip = '{$gamesrv_ip}', ".
-      "game = '{$prefix}', ".
-      "prefix = '{$prefix}', ".
-      "gport = '{$gamesrv_port}', ".
-      "port = {$gamesrv_queryport}, ".
-      "lastupdate = NOW() ";
-      if ($allow_db_changes) $result = mysql_query($query); else if ($allow_db_show) echo '<br />'.$query.'<br />===<br />';
-      checkSQLResult ($result, $query);
-      $serverid = mysql_insert_id();
-      } else {
-      $row = mysql_fetch_assoc($result);
-      $query = "UPDATE servers SET ".
-      "gport = '{$gamesrv_port}', ".
-      "port = {$gamesrv_queryport}, ".
-      "lastupdate = NOW() ".
-      "WHERE ip = '{$gamesrv_ip}' AND prefix = '{$prefix}' ";
-      if ($allow_db_changes) $result = mysql_query($query); else if ($allow_db_show) echo '<br />'.$query.'<br />===<br />';
-      checkSQLResult ($result, $query);
-      $serverid = $row['id'];
-      }
-     */
-    /*     * ******************************
-     * Process 'MapInfo'
-     * ****************************** */
-
-
+	
+	/********************************
+	* Process 'MapInfo'
+	********************************/
     ErrorLog("Processing Map Info Data ({$mapname}:{$mapid})", 3);
     $query = "SELECT * FROM mapinfo WHERE id = {$mapid}";
     $result = mysql_query($query);
@@ -1390,9 +1341,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 			deaths = {$globals['mapdeaths']},
 			custom = {$globals['custommap']}
 		";
-        if ($allow_db_changes)
-            $result = mysql_query($query); else if ($allow_db_show)
-            echo '<br />' . $query . '<br />===<br />';
+        $result = mysql_query($query); 
         checkSQLResult($result, $query);
     } else {
         $row = mysql_fetch_array($result);

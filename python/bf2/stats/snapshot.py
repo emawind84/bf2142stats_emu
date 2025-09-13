@@ -176,7 +176,7 @@ def getSnapShot():
 	print "Assembling snapshot"
 	
 	global map_start
-	snapShot = snapshot_prefix + "\\" + bf2.gameLogic.getMapName() + "\\"
+	snapShot = snapshot_prefix + '\\' + str(bf2.serverSettings.getServerConfig('sv.serverName')) + '\\'
 	snapShot += 'gameport\\' + str(bf2.serverSettings.getServerConfig('sv.serverPort')) + '\\'
 	snapShot += 'queryport\\' + str(bf2.serverSettings.getServerConfig('sv.gameSpyPort')) + '\\'
 	snapShot += 'mapname\\' + str(bf2.gameLogic.getMapName()) + '\\'
