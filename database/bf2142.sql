@@ -1448,3 +1448,77 @@ select
     `sw`.`wbh-47` as `hit47`
 from
     `stats_w` `sw`;
+
+
+-- bf2142stats_dev.v_unlocks source
+
+create or replace
+algorithm = UNDEFINED view `v_unlocks` as
+select
+    `u`.`pid` as `id`,
+    concat(`u`.`ukit`, concat(`u`.`utree`, `u`.`uorder`)) as `kit`,
+    'y' as `state`
+from
+    `unlocks` `u`;
+
+
+-- bf2142stats_dev.vehicles source
+
+create or replace
+algorithm = UNDEFINED view `vehicles` as
+select
+    `sv`.`pid` as `id`,
+    `sv`.`vdths-0` as `deaths0`,
+    `sv`.`vtp-0` as `time0`,
+    `sv`.`vkls-0` as `kills0`,
+    `sv`.`vrkls-0` as `rk0`,
+    `sv`.`vdths-1` as `deaths1`,
+    `sv`.`vtp-1` as `time1`,
+    `sv`.`vkls-1` as `kills1`,
+    `sv`.`vrkls-1` as `rk1`,
+    `sv`.`vdths-2` as `deaths2`,
+    `sv`.`vtp-2` as `time2`,
+    `sv`.`vkls-2` as `kills2`,
+    `sv`.`vrkls-2` as `rk2`,
+    `sv`.`vdths-4` as `deaths4`,
+    `sv`.`vtp-4` as `time4`,
+    `sv`.`vkls-4` as `kills4`,
+    `sv`.`vrkls-4` as `rk4`,
+    `sv`.`vdths-6` as `deaths6`,
+    `sv`.`vtp-6` as `time6`,
+    `sv`.`vkls-6` as `kills6`,
+    `sv`.`vrkls-6` as `rk6`,
+    `sv`.`vdths-7` as `deaths7`,
+    `sv`.`vtp-7` as `time7`,
+    `sv`.`vkls-7` as `kills7`,
+    `sv`.`vrkls-7` as `rk7`,
+    `sv`.`vdths-8` as `deaths8`,
+    `sv`.`vtp-8` as `time8`,
+    `sv`.`vkls-8` as `kills8`,
+    `sv`.`vrkls-8` as `rk8`,
+    `sv`.`vdths-10` as `deaths10`,
+    `sv`.`vtp-10` as `time10`,
+    `sv`.`vkls-10` as `kills10`,
+    `sv`.`vrkls-10` as `rk10`,
+    `sv`.`vdths-11` as `deaths11`,
+    `sv`.`vtp-11` as `time11`,
+    `sv`.`vkls-11` as `kills11`,
+    `sv`.`vrkls-11` as `rk11`,
+    `sv`.`vdths-12` as `deaths12`,
+    `sv`.`vtp-12` as `time12`,
+    `sv`.`vkls-12` as `kills12`,
+    `sv`.`vrkls-12` as `rk12`,
+    `sv`.`vdths-13` as `deaths13`,
+    `sv`.`vtp-13` as `time13`,
+    `sv`.`vkls-13` as `kills13`,
+    `sv`.`vrkls-13` as `rk13`,
+    `sv`.`vdths-14` as `deaths14`,
+    `sv`.`vtp-14` as `time14`,
+    `sv`.`vkls-14` as `kills14`,
+    `sv`.`vrkls-14` as `rk14`,
+    `sv`.`vdths-15` as `deaths15`,
+    `sv`.`vtp-15` as `time15`,
+    `sv`.`vkls-15` as `kills15`,
+    `sv`.`vrkls-15` as `rk15`
+from
+    `stats_v` `sv`;
