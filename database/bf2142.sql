@@ -1079,7 +1079,7 @@ CREATE TABLE IF NOT EXISTS `round_history` (
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
 
 
--- bf2142stats_dev.maps source
+-- bf2142stats.maps source
 
 create or replace
 algorithm = UNDEFINED view `maps` as
@@ -1094,7 +1094,8 @@ select
 from
     `stats_m`
 group by
-    `stats_m`.`pid`;
+    `stats_m`.`pid`,
+    `stats_m`.`mapid`;
 
 
 -- bf2142stats_dev.player source
