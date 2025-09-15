@@ -1523,3 +1523,12 @@ select
     `sv`.`vrkls-15` as `rk15`
 from
     `stats_v` `sv`;
+
+    
+-- bf2142stats.kills definition
+
+CREATE TABLE IF NOT EXISTS `kills` (
+  `attacker` int(8) unsigned DEFAULT NULL,
+  `victim` int(8) unsigned DEFAULT NULL,
+  `count` int(10) unsigned DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

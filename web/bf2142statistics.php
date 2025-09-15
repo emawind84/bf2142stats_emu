@@ -111,8 +111,10 @@ if ($rawdata) {
 // Make key/value pairs
 $prefix = $gooddata[0];
 $servername = $gooddata[1];
+$sizeGoodData = count($gooddata);
 $badtime = false;
-for ($x = 2; $x < count($gooddata); $x += 2) {
+for ($x = 2; $x < $sizeGoodData; $x += 2) 
+{
     if ($gooddata[$x + 1] >= 184467440000) {
         $badtime = true;
         //$gooddata[$x + 1] = $gooddata[$x + 1] - 184467440000;
@@ -1109,10 +1111,53 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                         }
                         if ($allow_db_changes)
                             $result3 = mysql_query($$query3);
-                        else if ($allow_db_show)
-                            echo '<br />' . $$query3 . '<br />===<br />';
                         checkSQLResult($result3, $$query3);
-                        ErrorLog(">>>>>>>>>>" . $$query3 . "", 3);
+                    }
+                }
+
+                /********************************
+                * Process 'Kills' 
+                ********************************/ 
+                ErrorLog("Processing Kill Data (".$data["pid_$x"].")", 3);
+                $mvns = array();
+                
+                // Keep the record count outside of the loop!
+                for($i = 0, $count = 0; $i < $sizeGoodData; $i++)
+                {
+                    if($gooddata[$i] == "mvns_$x")
+                    {
+                        $mvns[$count] = $gooddata[$i + 1];
+                        $mvns[++$count] = $gooddata[$i + 3];
+                        $count++;
+                    }
+                }
+                
+                // Keep the record count outside of the loop!
+                $sizeOfMvns = count($mvns);
+                $inserts = "";
+                
+                for($i = 0; $i < $sizeOfMvns; $i += 2)
+                {
+                    $query = "SELECT `count` FROM `kills` WHERE `attacker` = '" . $data["pid_$x"] . "'  AND `victim` = '" . $mvns[$i] . "'";
+                    $result = mysql_query($query);
+                    checkSQLResult($result, $query);
+                    $count = mysql_num_rows($result);
+                    if(empty($count))
+                    {
+                        // Insert information
+                        $query = "INSERT INTO `kills` VALUES (". $data["pid_$x"] . ", ". $mvns[$i] .", ". $mvns[$i + 1] .")";
+                        $result = mysql_query($query);
+                        checkSQLResult($result, $query);
+                    }
+                    else
+                    {
+                        // Only highest value can be count
+                        $killcount = ($count > $mvns[$i + 1]) ? $count : $mvns[$i + 1];
+                        $query = "UPDATE `kills` SET `count` = $killcount  WHERE `attacker` = '" . $data["pid_$x"]  . "' AND `victim` = '" . $mvns[$i] . "'";
+                        $result = mysql_query($query);
+                        checkSQLResult($result, $query);
+                        // Tag item as done
+                        $mvns[$i + 1] = 0;
                     }
                 }
 
