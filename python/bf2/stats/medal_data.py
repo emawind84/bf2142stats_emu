@@ -123,6 +123,7 @@ def game_mode_time (mode, value = None):
 			return 0
 	return _game_mode_time
 
+
 def game_mode_kills (mode, value=None):
 	if value == None:
 		def _game_mode_kills (player):			
@@ -135,8 +136,9 @@ def game_mode_kills (mode, value=None):
 			if int(getGameModeId(bf2.serverSettings.getGameMode())) == mode:
 				return player.score.kills >= value
 			else:
-				return 0
+				return False
 	return _game_mode_kills
+
 
 def army_time (army, value=None):
 	if value == None:
@@ -149,9 +151,10 @@ def army_time (army, value=None):
 		def _army_time (player):
 			if player.stats.army == army:
 				return int(player.stats.timePlayed) >= value
-			return 0
+			return False
 		
 	return _army_time
+
 
 def gpm_wins (mode, value=None):
 	globalKeysNeeded['mwin-0-0'] = 1
@@ -176,30 +179,21 @@ def gpm_wins (mode, value=None):
 	globalKeysNeeded['mwin-1-8'] = 1
 	globalKeysNeeded['mwin-1-9'] = 1
 
-	if value == None:
-		def _gpm_wins  (player):
-			wins = 0
-			i = 0
-			for map in mapMap:
-				key = 'mwin-' + str(mode) + '-' + str(i)
-				
-				if key in player.medals.globalKeys: wins += player.medals.globalKeys[key]
-				i += 1
+	def _gpm_wins  (player):
+		wins = 0
+		i = 0
+		for map in mapMap:
+			key = 'mwin-' + str(mode) + '-' + str(i)
+			
+			if key in player.medals.globalKeys: wins += player.medals.globalKeys[key]
+			i += 1
 
+		if value is None:
 			return wins
-	else:
-		def _gpm_wins  (player):
-			wins = 0
-			i = 0
-			for map in mapMap:
-				key = 'mwin-' + str(mode) + '-' + str(i)
-				
-				if key in player.medals.globalKeys: wins += player.medals.globalKeys[key]
-				i += 1
-
-			return wins >= value
+		return wins >= value
 	
 	return _gpm_wins
+
 
 def played_all_maps (army):
 	globalKeysNeeded['mtt-0-0'] = 1
@@ -245,17 +239,33 @@ def played_all_maps (army):
 
 	return _played_all_maps
 
-def played_map_time (army, value=None):
-	if value == None:
-		def _played_map_time  (player):
-			map = bf2.serverSettings.getMapName()
-			return int(int(getMapArmy(map)) == army and getMapId(map) != UNKNOWN_MAP) * player.stats.timePlayed
-	else:
-		def _played_map_time (player):
-			map = bf2.serverSettings.getMapName()
-			return (int(int(getMapArmy(map)) == army and getMapId(map) != UNKNOWN_MAP) * player.stats.timePlayed) >= value
-		
+def played_map_time(mapids, value=None):
+
+	def _played_map_time(player):
+		_mapid = getMapId(bf2.serverSettings.getMapName())
+		_gm = getGameModeId(bf2.serverSettings.getGameMode())
+		if _gm == 3: _gm = 0
+		combined = "%s-%s" % (_gm, _mapid)
+		if value is None:
+			return (combined in mapids) * player.stats.timePlayed
+		return (combined in mapids) * player.stats.timePlayed >= value
+	
 	return _played_map_time
+
+
+def total_dlc_map_time (value=None):
+	def _total_dlc_map_time (player):
+		time = 0
+		for mapid in mapNorthernStrike:
+			key = 'mtt-' + mapid	
+			if key in player.medals.globalKeys:	
+				time += player.medals.globalKeys[key]
+		if value is None:
+			return time
+		return time >= value
+
+	return _total_dlc_map_time
+
 
 def gpm_bestRound (mode, value=None):
 	globalKeysNeeded['mbr-0-0'] = 1
@@ -280,24 +290,17 @@ def gpm_bestRound (mode, value=None):
 	globalKeysNeeded['mbr-1-8'] = 1
 	globalKeysNeeded['mbr-1-9'] = 1
 
-	if value == None:
-		def _gpm_bestRound (player):
-			highs = 0
 
-			for map in mapMap:
-				key = 'mbr-' + str(mode) + '-' + str(getMapId(map))
-				if key in player.medals.globalKeys: highs += player.medals.globalKeys[key]
-								
+	def _gpm_bestRound (player):
+		highs = 0
+
+		for map in mapMap:
+			key = 'mbr-' + str(mode) + '-' + str(getMapId(map))
+			if key in player.medals.globalKeys: highs += player.medals.globalKeys[key]
+
+		if value is None:
 			return highs
-	else:
-		def _gpm_bestRound (player):
-			highs = 0
-
-			for map in mapMap:
-				key = 'mbr-' + str(mode) + '-' + str(getMapId(map))
-				if key in player.medals.globalKeys: highs += player.medals.globalKeys[key]
-
-			return highs >= value
+		return highs >= value
 
 	return _gpm_bestRound
 
@@ -680,27 +683,63 @@ medal_data = (
 
 			# Arctic Combat Badge
 			# 6 Kills playing Northern Strike in a Round
-			# ('120_1', 'acb', LIMIT_SINGLE, ),
+			# awards.setData 120_1 "6,152, ,6"
+			('120_1', 'acb', LIMIT_SINGLE, f_and(
+				player_score('kills', 6),
+				played_map_time(mapNorthernStrike, 1)
+			), 1),
 
 			# 10 Kills playing Northern Strike in a Round
 			# 02:00 Hours Playing Northern Strike
-			# ('120_2', 'acb', LIMIT_SINGLE, ),
+			# awards.setData 120_2 "6,152, ,10" "9,153,mtt-1-10;mtt-2-10;mtt-2-11;mtt-1-12;mtt-2-12,7200"
+			('120_2', 'acb', LIMIT_SINGLE, f_and(
+				player_score('kills', 10),
+				played_map_time(mapNorthernStrike, 1),
+				f_plus(played_map_time(mapNorthernStrike), total_dlc_map_time(), 7200)
+			), 1),
 
 			# 14 Kills playing Northern Strike in a Round
 			# 05:00 Hours Playing Northern Strike
-			# ('120_3', 'acb', LIMIT_SINGLE, ),
+			# awards.setData 120_3 "6,152, ,14" "9,153,mtt-1-10;mtt-2-10;mtt-2-11;mtt-1-12;mtt-2-12,18000"
+			('120_3', 'acb', LIMIT_SINGLE, f_and(
+				player_score('kills', 14),
+				played_map_time(mapNorthernStrike, 1),
+				f_plus(played_map_time(mapNorthernStrike), total_dlc_map_time(), 18000)
+			), 1),
 
 			# Vehicle Excellence Badge Bronze
 			# 5 Minutes in a Northern Strike Vehicle in a Round
-			# ('121_1', 'veb', LIMIT_SINGLE, ),
+			# awards.setData 121_1 "10,154, ,300"
+			('121_1', 'veb', LIMIT_SINGLE, f_plus(
+				object_stat ('vehicles', 'rtime', VEHICLE_TYPE_HOVER_FAV), 
+				object_stat ('vehicles', 'rtime', VEHICLE_TYPE_IFV), 300
+			), 1),
 
 			# 8 Kills with Northern Strike Vehicles in a Round
 			# 01:00 Hours in Northern Strike Vehicles
-			# ('121_2', 'veb', LIMIT_SINGLE, ),
+			# awards.setData 121_2 "6,156, ,8" "9,155,vtp-14;vtp-15,3600"
+			('121_2', 'veb', LIMIT_SINGLE, f_and(
+					f_plus( 
+						object_stat ('vehicles', 'kills', VEHICLE_TYPE_IFV), 
+						object_stat ('vehicles', 'kills', VEHICLE_TYPE_HOVER_FAV), 8),
+					f_plus(
+						f_plus(object_stat ('vehicles', 'rtime', VEHICLE_TYPE_HOVER_FAV), object_stat ('vehicles', 'rtime', VEHICLE_TYPE_IFV)),
+						f_plus(global_stat ('vtp-14'), global_stat ('vtp-15')), 3600
+					)
+			), 1),
 
 			# 12 Kills with Northern Strike Vehicles in a Round
 			# 04:00 Hours in Northern Strike Vehicles
-			# ('121_3', 'veb', LIMIT_SINGLE, ),
+			# awards.setData 121_3 "6,156, ,12" "9,155,vtp-14;vtp-15,14400"
+			('121_3', 'veb', LIMIT_SINGLE, f_and(
+					f_plus(
+						object_stat ('vehicles', 'kills', VEHICLE_TYPE_IFV), 
+						object_stat ('vehicles', 'kills', VEHICLE_TYPE_HOVER_FAV), 12),
+					f_plus(
+						f_plus(object_stat ('vehicles', 'rtime', VEHICLE_TYPE_HOVER_FAV), object_stat ('vehicles', 'rtime', VEHICLE_TYPE_IFV)),
+						f_plus(global_stat ('vtp-14'), global_stat ('vtp-15')), 14400
+					)
+			), 1),
 
 		#Ribbons
 
@@ -779,9 +818,10 @@ medal_data = (
 										object_stat ('vehicles', 'roadKills', VEHICLE_TYPE_FAAV)), 10)), 50),
 
 			#Pac Duty Ribbon
-			('311',	'Pdr',	LIMIT_SINGLE, f_and(	 f_plus( 	army_time (1), 
-								global_stat('attp-1'), 432000),
-								played_all_maps(1)), 50),			
+			('311',	'Pdr',	LIMIT_SINGLE, f_and(
+					f_plus(army_time (1), global_stat('attp-1'), 432000),
+					played_all_maps(1)
+			), 50),
 
 
 			#European Duty Ribbon
@@ -825,6 +865,56 @@ medal_data = (
 			#Titan Commander Ribbon
 			('319',	'Tcr',	LIMIT_SINGLE, f_and(	player_score('cmdTitanScore', 10),
 								global_stat('ctgpm-1', 90000)), 500),
+
+
+			# Operation Snowflake Ribbon
+			# In a Round: 5 Roadkills in the Speeder
+			# Career: 40 kills with Speeder
+			# awards.setData 320 "6,157, ,5" "5,158,vkls-15,40"
+			('320', 'Osr', LIMIT_SINGLE, f_and(
+				object_stat ('vehicles', 'roadKills', VEHICLE_TYPE_HOVER_FAV, 5),
+				f_plus(
+					global_stat ('vkls-15'),
+					object_stat ('vehicles', 'kills', VEHICLE_TYPE_HOVER_FAV), 40)
+			), 1),
+
+			# Cold Front Unit Service Ribbon
+			# In a Round: 15 Kills playing Northern Strike
+			# Career: 2 Wins playing Port Bavaria
+			# Career: 2 Wins playing Bridge at Remagen
+			# Career: 2 Wins playing Liberation of Leipzig
+			# awards.setData 321 "6,152, ,15" "5,159,mwin-1-12;mwin-2-12,2" "5,160,mwin-1-10;mwin-2-10,2" "5,161,mwin-2-11,2"
+			('321', 'Cfus', LIMIT_SINGLE, f_and(
+				player_score('kills', 15),
+				played_map_time(mapNorthernStrike, 1),
+				f_or( global_stat('mwin-0-12', 2), global_stat('mwin-1-12', 2), global_stat('mwin-2-12', 2)),
+				f_or( global_stat('mwin-0-11', 2), global_stat('mwin-1-11', 2), global_stat('mwin-2-11', 2)),
+				f_or( global_stat('mwin-0-10', 2), global_stat('mwin-1-10', 2), global_stat('mwin-2-10', 2))
+			), 1),
+
+			# Transporter Duty Ribbon
+			# In a Round: 9 kills with Goliath
+			# Career: 02:00 Hours in Goliath
+			# awards.setData 322 "6,162, ,9" "9,163,vtp-14,7200"
+			('322', 'Tdr', LIMIT_SINGLE, f_and(
+				object_stat ('vehicles', 'kills', VEHICLE_TYPE_IFV, 9),
+				f_plus( 
+					object_stat ('vehicles', 'rtime', VEHICLE_TYPE_IFV),
+					global_stat ('vtp-14'), 7200)
+			), 1),
+
+			# Meritious Winterstrike Ribbon
+			# Career: 4 Speeders Destroyed
+			# Career: 2 Goliaths Destroyed
+			# Career: 5 Deaths by Speeder
+			# Career: 5 Deaths by Goliath
+			# awards.setData 323 "7,164,vdstry-15,4" "7,165,vdstry-14,2" "7,166,vdths-15,5" "7,167,vdths-14,5"
+			('323', 'Mwr', LIMIT_SINGLE, f_and(
+				f_plus(global_stat ('vdstry-15', 4), object_stat ('vehicles', 'destroyed', VEHICLE_TYPE_HOVER_FAV)),
+				f_plus(global_stat ('vdstry-14', 4), object_stat ('vehicles', 'destroyed', VEHICLE_TYPE_IFV)),
+				f_plus(global_stat ('vdths-15', 5), object_stat ('vehicles', 'killedBy', VEHICLE_TYPE_HOVER_FAV)),
+				f_plus(global_stat ('vdths-14', 5), object_stat ('vehicles', 'killedBy', VEHICLE_TYPE_IFV))
+			), 1),
 
 		#Medals
 			
@@ -966,10 +1056,14 @@ medal_data = (
 								global_stat('vtp-4', 90000)),  0),
 
 			#Titan Medallion
-			('218',	'Tme',	LIMIT_SINGLE, f_and(	f_plus (	game_mode_time (1),
-								global_stat ('tgpm-1'), 540000),
-								game_mode_kills (1, 10),
-								gpm_bestRound (1, 70)), 0),
+			('218',	'Tme',	LIMIT_SINGLE, f_and(
+				f_plus (
+					game_mode_time (1),
+					global_stat ('tgpm-1'), 540000
+				),
+				game_mode_kills (1, 10),
+				gpm_bestRound (1, 70)
+			), 0),
 
 			#Ground Base Medallion
 			('219',	'Gbm',	LIMIT_SINGLE, f_and(	player_score ('kills', 20),
@@ -1027,7 +1121,7 @@ medal_data = (
 			('411', 'Erp', LIMIT_MULTI, player_score_multiple_times ('revives', 8, '411'), 5),
 
 			#Titan survival pin
-			 ('412', 'Tsp',	LIMIT_MULTI, object_stat_multiple_times ('weapons', 'kills', WEAPON_TYPE_FLIPPER_MINE, 4, '412'), 10),
+			 ('412', 'Tsp',	LIMIT_MULTI, player_stat ('aliveOnTitanDestruction'), 10),
 
 			#Firearm Efficiency Pin
 			('413',	'Fep', LIMIT_MULTI, f_plus(	object_stat_multiple_times ('weapons', 'kills', WEAPON_TYPE_EU_PISTOL, 4, '413', 1),
@@ -1039,7 +1133,16 @@ medal_data = (
 									object_stat_multiple_times ('vehicles', 'kills', VEHICLE_TYPE_TITAN_AA, 10, '414', 1), 10), 10),
 
 			#Close Combat Pin
-			('415',	'Ccp', LIMIT_MULTI, object_stat_multiple_times ('weapons', 'kills', WEAPON_TYPE_AUTO_SHOTGUN, 10, '415'), 10)			
+			('415',	'Ccp', LIMIT_MULTI, object_stat_multiple_times ('weapons', 'kills', WEAPON_TYPE_AUTO_SHOTGUN, 10, '415'), 10),
+
+
+			#Assault Lines Attack Pin*
+			# Capture the PAC home base in Assault Lines
+			# awards.setData 416 "6,168, ,"
+			('416', 'Ala', LIMIT_MULTI, f_and(
+				player_score('fullCaptures'),
+				f_mult(game_mode_time(2, 1), 1, 1)
+			), 10)
 		)
 
 

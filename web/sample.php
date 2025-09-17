@@ -2,6 +2,52 @@
   <body>
     <form action="sample.php" method="post">
 <?php
+
+
+/*
+| ---------------------------------------------------------------
+| Define Constants
+| ---------------------------------------------------------------
+*/
+define('DS', DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__FILE__) . DS);
+define('SYSTEM_PATH', ROOT . DS . 'system');
+
+/*
+| ---------------------------------------------------------------
+| Set Error Reporting and Zlib Compression
+| ---------------------------------------------------------------
+*/
+error_reporting(E_ALL);
+ini_set("log_errors", "1");
+if (!getenv('PHP_VERSION')) {
+    # Not running in docker. Log errors to file
+    ini_set("error_log", SYSTEM_PATH . DS . 'logs' . DS . 'php_errors.log');
+}
+ini_set("display_errors", "0");
+
+// Disable Zlib Compression
+ini_set('zlib.output_compression', '0');
+
+
+require(ROOT . DS . 'include' . DS . '_ccconfig.php');
+require(ROOT . DS . 'include' . DS . 'utils.php');
+require(SYSTEM_PATH . DS . 'core'. DS .'AutoLoader.php');
+require(SYSTEM_PATH . DS . 'functions.php');
+
+$cfg = new Config();
+
+// Register AutoLoader
+AutoLoader::Register();
+AutoLoader::RegisterPath( path( SYSTEM_PATH, 'core' ) );
+
+// First, Lets make sure the IP can view the ASP
+if(!isIPInNetArray( Auth::ClientIp(), $cfg->get('admin_hosts') ))
+die("<font color='red'>ERROR:</font> You are NOT Authorised to access this Page! (Ip: ". Auth::ClientIp() .")");
+
+
+
+
 ini_set('user_agent',"GameSpyHTTP/1.0");
 require_once("ea_support.php");
 
@@ -32,9 +78,9 @@ if(isset($_REQUEST['clType']) AND $_REQUEST['clType'] != "") {
 	$clType = 0;
 }
 if(!isset($_REQUEST['server_type']) OR $_REQUEST['server_type'] == "" OR $_REQUEST['server_type'] == "local") {
-	$server_type = '86.111.224.14';
+	$server_type = 'stella.dev.emawind.com';
 } elseif(isset($_REQUEST['server_type']) AND isset($_REQUEST['server_type']) == "stella") {
-	$server_type = 'stella.prod.gamespy.com';
+	$server_type = 'stella.prod.openspy.net';
 }
 //----------------------------------------------------
 $timestamp_hex = strtoupper(dechex($timestamp));
@@ -72,7 +118,7 @@ echo '</tr><tr>';
 //echo '      <td>&nbsp;</td><td colspan="3"><input type="text" name="code2" size="50" maxlength="32" value="'.$auth_.'"></td><td><input type="submit" name="action" value="2Get Auth Key"></td>'."\n";
 //echo '</tr><tr>';
 echo '      <td><b>AUTH:</b></td><td colspan="3"><input type="text" name="auth" size="50" maxlength="24" value="'.$auth.'"></td><td><input type="submit" name="action" value="Get Code (in HEX format)"></td><td><input type="checkbox" name="server_type" value="stella.prod.gamespy.com" ';
-if ($server_type == "stella.prod.gamespy.com") { echo " checked"; }
+if ($server_type == "stella.prod.openspy.net") { echo " checked"; }
 echo '>stella</td>'."\n";
 echo '</tr><tr>';
 echo '      <td><b>CODE:</b></td><td colspan="3"><input type="text" name="code" size="50" maxlength="32" value="'.$code.'"></td><td><input type="submit" name="action" value="Get Auth Key"></td><td><input type="checkbox" name="clType" value="1" ';
@@ -111,22 +157,24 @@ if($action == 'Get Auth Key') {
 	$test['7']	= 'playersearch.aspx?auth='.$auth;
 	
 	$array_url = array();
-	$array_url['stella.prod.gamespy.com'] = $test;
-	$array_url['86.111.224.14'] = $test;
+	$array_url['stella.dev.emawind.com'] = $test;
+	$array_url['stella.prod.openspy.net'] = $test;
 
 	echo '
 <table>';
 	foreach($array_url[$server_type] as $req) {
+		$content = getPageContents("http://".$server_type."/".$req);
+		$content = implode("", $content[0]);
 		echo '
 	<tr><td><a href="http://'.$server_type.'/'.$req.'" target="_blank">http://'.$server_type.'/'.$req.'</a></td></tr>
-	<tr><td><pre>'.getPageContents("http://".$server_type."/".$req).'</pre></td></tr>';
+	<tr><td><pre>'. $content .'</pre></td></tr>';
 	}
 	echo '
 </table>
 ';
 }
 
-function getPageContents($url){
+function _getPageContents($url){
 	// Try file() first
 	/*
 	if( function_exists('file') && function_exists('fopen') && ini_get('allow_url_fopen') ) {
@@ -140,10 +188,6 @@ function getPageContents($url){
 	if( !($results) && (function_exists('curl_exec')) ) {
 		$curl_handle = curl_init();
 		curl_setopt($curl_handle, CURLOPT_URL, $url);
-		$sip = '86.111.224.14';
-		$sip = '195.140.177.250';
-		curl_setopt($curl_handle, CURLOPT_INTERFACE, $sip);
-		//curl_setopt($curl_handle, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 5.5; Windows NT 5.0)");
 		curl_setopt($curl_handle, CURLOPT_USERAGENT, "GameSpyHTTP/1.0");
 		curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 1);

@@ -188,6 +188,8 @@ def getSnapShot():
 
 	statsMap = getStatsMap()
 	
+	if g_debug: print ">>> statsMap dir: %s" % dir(statsMap)
+
 	# ----------------------------------------------------------------------------
 	# omero 2006-04-10
 	# ----------------------------------------------------------------------------
@@ -248,6 +250,9 @@ def getSnapShot():
 	return snapShot
 
 def getPlayerSnapshot(playerStat):
+	if g_debug: print ">>> playerStat dir: %s" % dir(playerStat)
+	if g_debug: print ">>> localScore dir: %s" % dir(playerStat.localScore)
+	if g_debug: print "playerStat.localScore.fullCaptures: %s" % playerStat.localScore.fullCaptures
 	if g_debug: print "snapshot.py: playerStat.profileId"
 	awayBonus = int(playerStat.localScore.awayBonusScoreIAR + playerStat.localScore.awayBonusScore)
 	totalScore = (playerStat.score - playerStat.localScore.diffRankScore) + int(playerStat.localScore.experienceScoreIAR + playerStat.localScore.experienceScore) + int(awayBonus)
@@ -256,7 +261,7 @@ def getPlayerSnapshot(playerStat):
 	playerKeys = 	[
 		# main keys 
 		("pid",		playerStat.profileId								),	#? => pID
-		("nick",	playerStat.name										),	#? => Nickname
+		("nick",	nickname											),	#? => Nickname
 		("t",		playerStat.team										),
 		("a",		playerStat.army										),
 		("tt",		int(playerStat.timePlayed)							),	#+ => Time Played
@@ -308,7 +313,9 @@ def getPlayerSnapshot(playerStat):
 		("tots",	playerStat.bulletsFired								),	#+ => Total Fired
 		("tvdmg",	playerStat.localScore.teamVehicleDamages			),	#+ => Team Vehicle Damage
 		("twsc",	playerStat.teamScore								),	#+ => Teamwork Score
-		
+		# Base Game Stuff
+		("ta0",		int(playerStat.timeAsArmy[0])						),
+		("ta1",		int(playerStat.timeAsArmy[1])						),
 	]
 
 	# victims / victimizers
@@ -319,14 +326,18 @@ def getPlayerSnapshot(playerStat):
 		else:
 			playerKeys.append(("mvns", str(statsMap[p].profileId)))
 			playerKeys.append(("mvks", str(playerStat.killedPlayer[p])))
+
 	keyvals = []
 	for k in playerKeys:
 		keyvals.append ("\\".join((k[0], str(k[1]))))
 	playerSnapShot = "\\".join(keyvals)
+
 	# medals
 	medalsSnapShot = ""
 	if playerStat.medals:
+		if g_debug: print "Medals Found (%s), Processing Medals Snapshot" % (playerStat.profileId)
 		medalsSnapShot = playerStat.medals.getSnapShot()
+
 	################ vehicles
 	vehiclesSS = {}
 	for v in range(0, NUM_VEHICLE_TYPES):
@@ -356,7 +367,8 @@ def getPlayerSnapshot(playerStat):
 	for v in vehiclesSS:
 		vehiclekeyvals.append ("\\".join((v, str(vehiclesSS[v]))))
 	vehicleSnapShot = "\\".join(vehiclekeyvals)
-#	# kits
+
+	# kits
 	kitKeys = 	[
 			("kdths-0",	playerStat.kits[KIT_TYPE_RECON].deaths					),	#+ => deads as Recon
 			("kdths-1",	playerStat.kits[KIT_TYPE_ASSAULT].deaths				),	#+ => deads as Assault
@@ -375,6 +387,7 @@ def getPlayerSnapshot(playerStat):
 	for k in kitKeys:
 		kitkeyvals.append ("\\".join((k[0], str(k[1]))))
 	kitSnapShot = "\\".join(kitkeyvals)
+
 	############## weapons
 	weaponsSS = {}
 	for w in range(0, NUM_WEAPON_TYPES):
@@ -388,22 +401,27 @@ def getPlayerSnapshot(playerStat):
 			weaponsSS["wtp-"   + str(w) ] = int(weapon.timeInObject)
 			weaponsSS["wbf-"   + str(w) ] = weapon.bulletsFired
 			weaponsSS["wbh-"   + str(w) ] = weapon.bulletsHit
+
 	weaponkeyvals = []
 	for w in weaponsSS:
 		weaponkeyvals.append ("\\".join((w, str(weaponsSS[w]))))
 	weaponSnapShot = "\\".join(weaponkeyvals)
+
 	allSnapShots = []
 	if len(playerSnapShot) > 0 : allSnapShots = allSnapShots + [playerSnapShot]
 	if len(medalsSnapShot) > 0 : allSnapShots = allSnapShots + [medalsSnapShot]
 	if len(vehicleSnapShot) > 0 : allSnapShots = allSnapShots + [vehicleSnapShot]
 	if len(kitSnapShot) > 0 : allSnapShots = allSnapShots + [kitSnapShot]
 	if len(weaponSnapShot) > 0 : allSnapShots = allSnapShots + [weaponSnapShot]
+
 	playerSnapShot = "\\".join(allSnapShots)
 	if g_debug: print "\n-------\n" + str(playerSnapShot) + "\n-------\n"
+
 	# add pid to all keys (gamespy likes this)
 	transformedSnapShot = ""
 	i = 0
 	idString = "_" + str(playerStat.connectionOrderNr)
+
 	while i < len(playerSnapShot):
 		key = ""
 		while playerSnapShot[i] != "\\":
@@ -419,4 +437,5 @@ def getPlayerSnapshot(playerStat):
 			transformedKeyVal += "\\"
 		transformedSnapShot += transformedKeyVal
 		i += 1
+
 	return "\\" + transformedSnapShot

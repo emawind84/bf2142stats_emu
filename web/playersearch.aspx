@@ -81,7 +81,7 @@ if (!mysql_num_rows($result1)) {
 		$pid = $row['pid'];
 		$nickname = rawurldecode($row['nick']);
 		$Out .= "\nD\t".$pid."\t".$nickname;
-		error_log(">>>".$row['nick']);
+		// error_log(">>>".$row['nick']);
 	}
 }
 /*

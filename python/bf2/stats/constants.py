@@ -459,6 +459,13 @@ mapArmyMap = {
 	"molokai"		: ARMY_EU,
 }
 
+mapNorthernStrike = [
+	"0-10", "0-11", "0-12",
+	"1-10", "1-11", "1-12",
+	"2-10", "2-11", "2-12",
+	"2-14" 
+]
+
 UNKNOWN_MAPARMY = 99
 
 gameModeMap = {
