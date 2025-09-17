@@ -711,6 +711,50 @@ group by
     `p`.`pid`;");
 
 
+$sqlupgrade[] = array('Add comment to csgpm-0 in playerprogress', '1.11.1',
+"ALTER TABLE bf2142stats_dev.playerprogress MODIFY COLUMN `csgpm-0` int(10) unsigned DEFAULT 0 NOT NULL COMMENT 'Conquest commander score';");
+
+$sqlupgrade[] = array('Add comment to csgpm-0 in playerprogress', '1.11.1',
+"INSERT INTO mapinfo (id, name, score, `time`, times, kills, deaths, custom) VALUES
+(0, 'suez_canal', 0, 0, 0, 0, 0, 0),
+(1, 'verdun', 0, 0, 0, 0, 0, 0),
+(2, 'shuhia_taiba', 0, 0, 0, 0, 0, 0),
+(3, 'minsk', 0, 0, 0, 0, 0, 0),
+(4, 'camp_gibraltar', 0, 0, 0, 0, 0, 0),
+(5, 'sidi_power_plant', 0, 0, 0, 0, 0, 0),
+(6, 'fall_of_berlin', 0, 0, 0, 0, 0, 0),
+(7, 'belgrade', 0, 0, 0, 0, 0, 0),
+(8, 'cerbere_landing', 0, 0, 0, 0, 0, 0),
+(9, 'tunis_harbor', 0, 0, 0, 0, 0, 0),
+(10, 'bridge_at_remagen', 0, 0, 0, 0, 0, 0),
+(11, 'liberation_of_leipzig', 0, 0, 0, 0, 0, 0),
+(12, 'port_bavaria', 0, 0, 0, 0, 0, 0),
+(14, 'highway_tampa', 0, 0, 0, 0, 0, 0),
+(15, 'operation_blue_pearl', 0, 0, 0, 0, 0, 0),
+(16, 'wake_island_2142', 0, 0, 0, 0, 0, 0),
+(17, 'operation_shingle', 0, 0, 0, 0, 0, 0),
+(18, 'yellow_knife', 0, 0, 0, 0, 0, 0),
+(19, 'strike_at_karkand', 0, 0, 0, 0, 0, 0),
+(20, 'molokai', 0, 0, 0, 0, 0, 0),
+(101, 'sidi_power_plant_coop', 0, 0, 0, 0, 0, 0),
+(102, 'hamburg_harbour_coop', 0, 0, 0, 0, 0, 0),
+(103, 'verdun_coop', 0, 0, 0, 0, 0, 0),
+(104, 'tunis_harbor_coop', 0, 0, 0, 0, 0, 0),
+(105, 'suez_canal_coop', 0, 0, 0, 0, 0, 0),
+(106, 'shuhia_taiba_coop', 0, 0, 0, 0, 0, 0),
+(107, 'operation_shingle_coop', 0, 0, 0, 0, 0, 0),
+(108, 'minsk_coop', 0, 0, 0, 0, 0, 0),
+(109, 'liberation_of_leipzig_coop', 0, 0, 0, 0, 0, 0),
+(110, 'highway_tampa_coop', 0, 0, 0, 0, 0, 0),
+(111, 'cerbere_landing_coop', 0, 0, 0, 0, 0, 0),
+(112, 'camp_gibraltar_coop', 0, 0, 0, 0, 0, 0),
+(113, 'camp_gibraltar_2_coop', 0, 0, 0, 0, 0, 0),
+(114, 'bridge_at_remagen_coop', 0, 0, 0, 0, 0, 0),
+(115, 'belgrade_coop', 0, 0, 0, 0, 0, 0),
+(116, 'fall_of_berlin_coop', 0, 0, 0, 0, 0, 0);
+");
+
+
 
 
 $sqlupgrade[] = array('Update Version Table', CODE_VER,
