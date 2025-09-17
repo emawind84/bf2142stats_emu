@@ -22,8 +22,8 @@ VEHICLE_TYPE_TITAN_AA	= 12
 VEHICLE_TYPE_TITAN_GDEF	= 13
 VEHICLE_TYPE_IFV	= 14
 VEHICLE_TYPE_HOVER_FAV	= 15
-	
-	
+    
+    
 NUM_VEHICLE_TYPES 	= 16
 VEHICLE_TYPE_UNKNOWN 	= NUM_VEHICLE_TYPES
 
@@ -391,202 +391,219 @@ weaponClassMap = {
 
 
 kitTypeMap = {
-	"eu_assault"		: KIT_TYPE_ASSAULT,
-	"eu_recon"		: KIT_TYPE_RECON,
-	"eu_support"		: KIT_TYPE_SUPPORT,
-	"eu_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
-	"bp1_eu_assault"	: KIT_TYPE_ASSAULT,
-	"bp1_eu_recon"		: KIT_TYPE_RECON,
-	"bp1_eu_support"	: KIT_TYPE_SUPPORT,
-	"bp1_eu_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
-	"pac_assault"		: KIT_TYPE_ASSAULT,
-	"pac_recon"		: KIT_TYPE_RECON,
-	"pac_support"		: KIT_TYPE_SUPPORT,
-	"pac_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
-	"bp1_pac_assault"	: KIT_TYPE_ASSAULT,
-	"bp1_pac_recon"		: KIT_TYPE_RECON,
-	"bp1_pac_support"	: KIT_TYPE_SUPPORT,
-	"bp1_pac_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
+    "eu_assault"		: KIT_TYPE_ASSAULT,
+    "eu_recon"		: KIT_TYPE_RECON,
+    "eu_support"		: KIT_TYPE_SUPPORT,
+    "eu_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
+    "bp1_eu_assault"	: KIT_TYPE_ASSAULT,
+    "bp1_eu_recon"		: KIT_TYPE_RECON,
+    "bp1_eu_support"	: KIT_TYPE_SUPPORT,
+    "bp1_eu_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
+    "pac_assault"		: KIT_TYPE_ASSAULT,
+    "pac_recon"		: KIT_TYPE_RECON,
+    "pac_support"		: KIT_TYPE_SUPPORT,
+    "pac_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
+    "bp1_pac_assault"	: KIT_TYPE_ASSAULT,
+    "bp1_pac_recon"		: KIT_TYPE_RECON,
+    "bp1_pac_support"	: KIT_TYPE_SUPPORT,
+    "bp1_pac_anti-vehicle"	: KIT_TYPE_ANTI_VEHICLE,
 }
 
 armyMap = {
-	"eu"			: ARMY_EU,
-	"pac"			: ARMY_PAC,
+    "eu"			: ARMY_EU,
+    "pac"			: ARMY_PAC,
 }
 
 mapMap = {
-	"suez_canal" 		: 0,
-	"verdun" 		: 1,
-	"shuhia_taiba" 		: 2,
-	"minsk" 		: 3,
-	"camp_gibraltar" 	: 4,
-	"sidi_power_plant" 	: 5,
-	"fall_of_berlin" 	: 6,
-	"belgrade" 		: 7,
-	"cerbere_landing" 	: 8,
-	"tunis_harbor"	 	: 9,
-	"bridge_at_remagen"	: 10,
-	"liberation_of_leipzig"	: 11,
-	"port_bavaria"		: 12,
-	"highway_tampa"		: 14,
-	"operation_blue_pearl"	: 15,
-	"wake_island_2142"	: 16,
-	"operation_shingle"	: 17,
-	"yellow_knife"		: 18,
-	"strike_at_karkand"	: 19,
-	"molokai"		: 20,
+    "suez_canal"                : 0,
+    "verdun"                    : 1,
+    "shuhia_taiba"              : 2,
+    "minsk"                     : 3,
+    "camp_gibraltar"            : 4,
+    "sidi_power_plant"          : 5,
+    "fall_of_berlin"            : 6,
+    "belgrade"                  : 7,
+    "cerbere_landing"           : 8,
+    "tunis_harbor"              : 9,
+    "bridge_at_remagen"         : 10,
+    "liberation_of_leipzig"     : 11,
+    "port_bavaria"              : 12,
+    "highway_tampa"             : 14,
+    "operation_blue_pearl"      : 15,
+    "wake_island_2142"          : 16,
+    "operation_shingle"         : 17,
+    "yellow_knife"              : 18,
+    "strike_at_karkand"         : 19,
+    "molokai"                   : 20,
+    # Community Coop Maps
+    "sidi_power_plant_coop"     : 101,
+    "hamburg_harbour_coop"      : 102,
+    "verdun_coop"               : 103,
+    "tunis_harbor_coop"         : 104,
+    "suez_canal_coop"           : 105,
+    "shuhia_taiba_coop"         : 106,
+    "operation_shingle_coop"    : 107,
+    "minsk_coop"                : 108,
+    "liberation_of_leipzig_coop": 109,
+    "highway_tampa_coop"        : 110,
+    "cerbere_landing_coop"      : 111,
+    "camp_gibraltar_coop"       : 112,
+    "camp_gibraltar_2_coop"     : 113,
+    "bridge_at_remagen_coop"    : 114,
+    "belgrade_coop"             : 115,
+    "fall_of_berlin_coop"       : 116
 }
 
 UNKNOWN_MAP = 99
 
 mapArmyMap = {
-	"suez_canal" 		: ARMY_PAC,
-	"verdun" 		: ARMY_EU,
-	"shuhia_taiba" 		: ARMY_PAC,
-	"minsk" 		: ARMY_EU,
-	"camp_gibraltar" 	: ARMY_PAC,
-	"sidi_power_plant" 	: ARMY_PAC,
-	"fall_of_berlin" 	: ARMY_EU,
-	"belgrade" 		: ARMY_EU,
-	"cerbere_landing" 	: ARMY_EU,
-	"tunis_harbor"	 	: ARMY_PAC,
-	"highway_tampa"	 	: ARMY_EU,
-	"wake_island_2142"	: ARMY_EU,
-	"operation_shingle"	: ARMY_EU,
-	"operation_blue_pearl"	: ARMY_PAC,
-	"yellow_knife"		: ARMY_PAC,
-	"strike_at_karkand"	: ARMY_PAC,
-	"molokai"		: ARMY_EU,
+    "suez_canal" 		: ARMY_PAC,
+    "verdun" 		: ARMY_EU,
+    "shuhia_taiba" 		: ARMY_PAC,
+    "minsk" 		: ARMY_EU,
+    "camp_gibraltar" 	: ARMY_PAC,
+    "sidi_power_plant" 	: ARMY_PAC,
+    "fall_of_berlin" 	: ARMY_EU,
+    "belgrade" 		: ARMY_EU,
+    "cerbere_landing" 	: ARMY_EU,
+    "tunis_harbor"	 	: ARMY_PAC,
+    "highway_tampa"	 	: ARMY_EU,
+    "wake_island_2142"	: ARMY_EU,
+    "operation_shingle"	: ARMY_EU,
+    "operation_blue_pearl"	: ARMY_PAC,
+    "yellow_knife"		: ARMY_PAC,
+    "strike_at_karkand"	: ARMY_PAC,
+    "molokai"		: ARMY_EU,
 }
 
 mapNorthernStrike = [
-	"0-10", "0-11", "0-12",
-	"1-10", "1-11", "1-12",
-	"2-10", "2-11", "2-12",
-	"2-14" 
+    "0-10", "0-11", "0-12",
+    "1-10", "1-11", "1-12",
+    "2-10", "2-11", "2-12",
+    "2-14", "0-700", "0-109", "0-114"
 ]
 
 UNKNOWN_MAPARMY = 99
 
 gameModeMap = {
-	"gpm_cq"		: 0,
-	"gpm_ti"		: 1,	
-	"gpm_sl"		: 2,
-	"gpm_coop"		: 3,
-	"gpm_nv"		: 0,
-	"gpm_ca"		: 0,
+    "gpm_cq"		: 0,
+    "gpm_ti"		: 1,	
+    "gpm_sl"		: 2,
+    "gpm_coop"		: 3,
+    "gpm_nv"		: 0,
+    "gpm_ca"		: 0,
 }
 UNKNOWN_GAMEMODE = 99
 
 MAP_UNKNOWN			= 99
 
 mapTypeMap = {
-	"suez_canal" 		: MAPTYPE_BF2142,
-	"verdun" 		: MAPTYPE_BF2142,
-	"shuhia_taiba" 		: MAPTYPE_BF2142,
-	"minsk" 		: MAPTYPE_BF2142,
-	"camp_gibraltar" 	: MAPTYPE_BF2142,
-	"sidi_power_plant" 	: MAPTYPE_BF2142,
-	"fall_of_berlin" 	: MAPTYPE_BF2142,
-	"belgrade" 		: MAPTYPE_BF2142,
-	"cerbere_landing" 	: MAPTYPE_BF2142,
-	"tunis_harbor"	 	: MAPTYPE_BF2142,
-	"bridge_at_remagen"	: MAPTYPE_BP1,
-	"liberation_of_leipzig"	: MAPTYPE_BP1,
-	"port_bavaria"		: MAPTYPE_BP1,
-	"highway_tampa"		: MAPTYPE_FREE,
-	"wake_island_2142"	: MAPTYPE_FREE,
-	"operation_shingle"	: MAPTYPE_FREE,
-	"operation_blue_pearl"	: MAPTYPE_FREE,
-	"yellow_knife"		: MAPTYPE_FREE,
-	"strike_at_karkand"	: MAPTYPE_FREE,
-	"molokai"		: MAPTYPE_FREE,
+    "suez_canal" 		: MAPTYPE_BF2142,
+    "verdun" 		: MAPTYPE_BF2142,
+    "shuhia_taiba" 		: MAPTYPE_BF2142,
+    "minsk" 		: MAPTYPE_BF2142,
+    "camp_gibraltar" 	: MAPTYPE_BF2142,
+    "sidi_power_plant" 	: MAPTYPE_BF2142,
+    "fall_of_berlin" 	: MAPTYPE_BF2142,
+    "belgrade" 		: MAPTYPE_BF2142,
+    "cerbere_landing" 	: MAPTYPE_BF2142,
+    "tunis_harbor"	 	: MAPTYPE_BF2142,
+    "bridge_at_remagen"	: MAPTYPE_BP1,
+    "liberation_of_leipzig"	: MAPTYPE_BP1,
+    "port_bavaria"		: MAPTYPE_BP1,
+    "highway_tampa"		: MAPTYPE_FREE,
+    "wake_island_2142"	: MAPTYPE_FREE,
+    "operation_shingle"	: MAPTYPE_FREE,
+    "operation_blue_pearl"	: MAPTYPE_FREE,
+    "yellow_knife"		: MAPTYPE_FREE,
+    "strike_at_karkand"	: MAPTYPE_FREE,
+    "molokai"		: MAPTYPE_FREE,
 }
 
 UNKNOWN_MAPTYPE = 99
 
 
 def getVehicleType(templateName):
-	try:
-		vehicleType = vehicleTypeMap[string.lower(templateName)]
-	except KeyError:
-		return VEHICLE_TYPE_UNKNOWN
-	
-	return vehicleType
+    try:
+        vehicleType = vehicleTypeMap[string.lower(templateName)]
+    except KeyError:
+        return VEHICLE_TYPE_UNKNOWN
+    
+    return vehicleType
 
-	
+    
 def getWeaponType(templateName):
-	try:
-		weaponType = weaponTypeMap[string.lower(templateName)]
-	except KeyError:
-		return WEAPON_TYPE_UNKNOWN
-	
-	return weaponType
+    try:
+        weaponType = weaponTypeMap[string.lower(templateName)]
+    except KeyError:
+        return WEAPON_TYPE_UNKNOWN
+    
+    return weaponType
 
 
 def getWeaponClass(templateName):
-	try:
-		weaponClass = weaponClassMap[string.lower(templateName)]
-	except KeyError:
-		return WEAPON_CLASS_UNKNOWN
+    try:
+        weaponClass = weaponClassMap[string.lower(templateName)]
+    except KeyError:
+        return WEAPON_CLASS_UNKNOWN
 
-	return weaponClass
+    return weaponClass
 
-	
+    
 def getKitType(templateName):	
-	try:
-		kitType = kitTypeMap[string.lower(templateName)]
-	except KeyError:
-		return KIT_TYPE_UNKNOWN
-	
-	return kitType	
+    try:
+        kitType = kitTypeMap[string.lower(templateName)]
+    except KeyError:
+        return KIT_TYPE_UNKNOWN
+    
+    return kitType	
 
-	
-	
+    
+    
 def getArmy(templateName):
-	try:
-		army = armyMap[string.lower(templateName)]
-	except KeyError:
-		return ARMY_UNKNOWN
-	
-	return army
+    try:
+        army = armyMap[string.lower(templateName)]
+    except KeyError:
+        return ARMY_UNKNOWN
+    
+    return army
 
 
 
 def getMapId(mapName):
-	try:
-		mapId = mapMap[string.lower(mapName)]
-	except KeyError:
-		return UNKNOWN_MAP
-	
-	return mapId
+    try:
+        mapId = mapMap[string.lower(mapName)]
+    except KeyError:
+        return UNKNOWN_MAP
+    
+    return mapId
 
 
 def getMapArmy(mapName):
-	try:
-		mapArmyId = mapArmyMap[string.lower(mapName)]
-	except KeyError:
-		return UNKNOWN_MAPARMY
-	
-	return mapArmyId
+    try:
+        mapArmyId = mapArmyMap[string.lower(mapName)]
+    except KeyError:
+        return UNKNOWN_MAPARMY
+    
+    return mapArmyId
 
 
 def getGameModeId(gameMode):
-	try:
-		gameModeId = gameModeMap[string.lower(gameMode)]
-	except KeyError:
-		return UNKNOWN_GAMEMODE
-	
-	return gameModeId
+    try:
+        gameModeId = gameModeMap[string.lower(gameMode)]
+    except KeyError:
+        return UNKNOWN_GAMEMODE
+    
+    return gameModeId
 
 
 def getMapType(mapName):
-	try:
-		mapType = mapTypeMap[string.lower(mapName)]
-	except KeyError:
-		return UNKNOWN_MAPTYPE
+    try:
+        mapType = mapTypeMap[string.lower(mapName)]
+    except KeyError:
+        return UNKNOWN_MAPTYPE
 
-	return mapType
+    return mapType
 
 
 if g_debug: print "Stat constants loaded"

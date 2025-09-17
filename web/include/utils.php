@@ -47,7 +47,8 @@ function getDbVer() {
             $result = mysql_query($query);
 //			if ($result && mysql_num_rows($result)) {
             $row = mysql_fetch_array($result);
-            $curver = $row['dbver'];
+            if (isset($row['dbver']))
+                $curver = $row['dbver'];
 //			} else {
 //				$query = "SHOW TABLES LIKE 'player'";
 //				$result = mysql_query($query);
