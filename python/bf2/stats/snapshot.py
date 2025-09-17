@@ -1,4 +1,5 @@
 
+import sys
 import host
 import bf2.PlayerManager
 import re
@@ -108,6 +109,7 @@ def invoke():
 			print "Printing Snapshot as last resort manual processing: ", snapShot
 
 	print "SNAPSHOT Processing Time: %d" % (host.timer_getWallTime() - snapshot_start)
+	sys.stdout.flush()
 
 ## ------------------------------------------------------------------------------
 ## omero 2006-03-31
@@ -188,8 +190,6 @@ def getSnapShot():
 
 	statsMap = getStatsMap()
 	
-	if g_debug: print ">>> statsMap dir: %s" % dir(statsMap)
-
 	# ----------------------------------------------------------------------------
 	# omero 2006-04-10
 	# ----------------------------------------------------------------------------
@@ -246,13 +246,13 @@ def getSnapShot():
 	
 	# Add EOF marker for validation
 	snapShot += "\\EOF\\1"
-	
+	sys.stdout.flush()
 	return snapShot
 
 def getPlayerSnapshot(playerStat):
-	if g_debug: print ">>> playerStat dir: %s" % dir(playerStat)
-	if g_debug: print ">>> localScore dir: %s" % dir(playerStat.localScore)
-	if g_debug: print "playerStat.localScore.fullCaptures: %s" % playerStat.localScore.fullCaptures
+	# if g_debug: print ">>> playerStat dir: %s" % dir(playerStat)
+	# if g_debug: print ">>> localScore dir: %s" % dir(playerStat.localScore)
+	# if g_debug: print "playerStat.localScore.fullCaptures: %s" % playerStat.localScore.fullCaptures
 	if g_debug: print "snapshot.py: playerStat.profileId"
 	awayBonus = int(playerStat.localScore.awayBonusScoreIAR + playerStat.localScore.awayBonusScore)
 	totalScore = (playerStat.score - playerStat.localScore.diffRankScore) + int(playerStat.localScore.experienceScoreIAR + playerStat.localScore.experienceScore) + int(awayBonus)
@@ -437,5 +437,6 @@ def getPlayerSnapshot(playerStat):
 			transformedKeyVal += "\\"
 		transformedSnapShot += transformedKeyVal
 		i += 1
-
+	
+	sys.stdout.flush()
 	return "\\" + transformedSnapShot

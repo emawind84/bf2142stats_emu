@@ -1,3 +1,4 @@
+import sys
 import host
 import bf2.PlayerManager
 import bf2.GameLogic
@@ -158,6 +159,7 @@ def invoke():
 	if g_debug: print "endofround.py[160]: ", dataString
 	host.gl_sendEndOfRoundData(dataString)
 
+	sys.stdout.flush()
 	
 		
 def findTop(e, vkey, nkey, value, name):

@@ -1,5 +1,6 @@
 # rank upgrades
 
+import sys
 import host
 import bf2.PlayerManager
 import bf2.Timer
@@ -57,7 +58,7 @@ def onPlayerConnect(player):
 			
 	
 	if g_debug: print "rank.py[58]: Added player %d to rank checking" % (player.index)
-	
+	sys.stdout.flush()
 	
 	
 def onStatsResponse(succeeded, player, stats):

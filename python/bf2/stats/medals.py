@@ -1,5 +1,6 @@
 # medals upgrades
 
+import sys
 import host
 import bf2.PlayerManager
 import bf2.Timer
@@ -205,7 +206,8 @@ def onPlayerConnect(player):
 		# fetch player awards from a friendly place
 		if not success:
 			if g_debug: print "medals.py[279]: Retrieving player AWARDS via HTTP/1.1 miniclient"
-
+	
+	sys.stdout.flush()
 
 def onPlayerDisconnect(player):
 	pass

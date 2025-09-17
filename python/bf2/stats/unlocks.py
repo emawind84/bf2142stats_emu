@@ -1,3 +1,4 @@
+import sys
 import host
 import bf2.PlayerManager
 from bf2 import g_debug
@@ -29,6 +30,7 @@ def onPlayerConnect(player):
 		if g_debug: print "unlocks.py[29]: Player %d had no profile id, can't request unlocks" % player.index
 		
 	if g_debug: print "unlocks.py[31]: Added player %d to unlock checking" % (player.index)
+	sys.stdout.flush()
 
 
 def onGameStatusChanged(status):

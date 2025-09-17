@@ -3,7 +3,6 @@ class Upgradedb
 {
 	public function Init() 
 	{
-		error_log(">>> processing Init!");
 		// Make sure the database if offline
 		if(DB_VER == '0.0.0')
 			redirect('home');

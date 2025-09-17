@@ -1140,7 +1140,7 @@ medal_data = (
 			# Capture the PAC home base in Assault Lines
 			# awards.setData 416 "6,168, ,"
 			('416', 'Ala', LIMIT_MULTI, f_and(
-				player_score('fullCaptures'),
+				player_score('fullCaptures', 1),
 				f_mult(game_mode_time(2, 1), 1, 1)
 			), 10)
 		)

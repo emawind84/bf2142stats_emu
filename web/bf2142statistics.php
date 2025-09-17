@@ -140,6 +140,8 @@ $offset = 2 * 60 * 60; //converting 2 hours to seconds.
 $dateFormat = "d-m-Y";
 
 $mapname = strtolower($data['mapname']);
+if (empty($mapname))  // for compatibility with old snapshots
+    $mapname = $servername;
 $mapdate = gmdate('Ymd_Hi', (int) $data['mapstart'] + $offset);
 $currentDate = gmdate('Ymd', (int) $data['mapstart'] + $offset);
 $currdate = gmdate("Y-m-d", time() + $offset);
@@ -284,18 +286,19 @@ checkSQLResult($result, $query);
 $gamesrv = mysql_fetch_assoc($result);
 if (!mysql_num_rows($result))
 {
-    // $query = "INSERT INTO `servers` SET ".
-    //     "`ip` = '{$gamesrv_ip}', ".
-    //     "`name` = '{$servername}', ".
-    //     "`prefix` = '{$prefix}', ".
-    //     "`port` = '{$gamesrv_port}', ".
-    //     "`queryport` = {$gamesrv_qryport}, ".
-    //     "`lastupdate` = NOW() ";
-    // $result = mysql_query($query);
-    // checkSQLResult($result, $query);
-    $errmsg = " - Server not found! Snapshot will not be processed.";
-    ErrorLog($errmsg, 3);
-    die(_ERR_RESPONSE . $errmsg);
+    $query = "INSERT INTO `servers` SET ".
+        "`ip` = '{$gamesrv_ip}', ".
+        "`name` = '{$servername}', ".
+        "`prefix` = '{$prefix}', ".
+        "`port` = '{$gamesrv_port}', ".
+        "`queryport` = {$gamesrv_qryport}, ".
+        "`ranked` = 1, ".
+        "`lastupdate` = NOW() ";
+    $result = mysql_query($query);
+    checkSQLResult($result, $query);
+    // $errmsg = " - Server not found! Snapshot will not be processed.";
+    // ErrorLog($errmsg, 3);
+    // die(_ERR_RESPONSE . $errmsg);
 } 
 else if ($gamesrv['ranked'])
 {
@@ -388,27 +391,12 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 ErrorLog("Processing Player (" . $data["pid_$x"] . ")", 3);
                 $query1 = "SELECT * FROM subaccount s " .
                         " LEFT JOIN `playerprogress` p ON p.pid=s.id" .
-                        " LEFT JOIN `stats_a` a ON a.pid=p.pid" .
                         " LEFT JOIN `stats_e` e ON e.pid=p.pid" .
-                        " LEFT JOIN `stats_m` m ON m.pid=p.pid" .
                         " LEFT JOIN `stats_v` v ON v.pid=p.pid" .
                         " LEFT JOIN `stats_w` w ON w.pid=p.pid" .
-                        " WHERE s.id=" . $data["pid_$x"] . " AND a._gm=" . $data["gm"] . " AND a._date='" . $mapdate . "' LIMIT 1";
+                        " WHERE s.id=" . $data["pid_$x"] . " LIMIT 1";
                 $result1 = mysql_query($query1);
                 checkSQLResult($result1, $query1);
-                if (!mysql_num_rows($result1)) {
-                    $query1 = "SELECT * FROM subaccount s " .
-                            " LEFT JOIN `playerprogress` p ON p.pid=s.id" .
-                            " LEFT JOIN `stats_a` a ON a.pid=p.pid" .
-                            " LEFT JOIN `stats_e` e ON e.pid=p.pid" .
-                            " LEFT JOIN `stats_m` m ON m.pid=p.pid" .
-                            " LEFT JOIN `stats_v` v ON v.pid=p.pid" .
-                            " LEFT JOIN `stats_w` w ON w.pid=p.pid" .
-                            " WHERE s.id=" . $data["pid_$x"] . " LIMIT 1";
-                    $result1 = mysql_query($query1);
-
-                    checkSQLResult($result1, $query1);
-                }
 
                 if (!mysql_num_rows($result1)) {
                     ErrorLog("Player (" . $data["pid_$x"] . ") not found in `subaccount`.", 3);
@@ -607,12 +595,11 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 //csgpm-1	Titan Commander Score
                 if (isset($data["cs_$x"]) AND $data["cs_$x"] > 0) {
                     $query3p .= " `cs`=(`cs`+" . $data["cs_$x"] . "),";
-//Sinth Commented                    
-//                    if ($data['gm'] == 0) {
-//                        $query3a .= " `csgpm-0`=(`csgpm-0`+" . $data["cs_$x"] . "),";
-//                    } elseif ($data['gm'] == 1) {
-//                        $query3a .= " `csgpm-1`=(`csgpm-1`+" . $data["cs_$x"] . "),";
-//                    }
+                    if ($data['gm'] == 0) {
+                        $query3p .= " `csgpm-0`=(`csgpm-0`+" . $data["cs_$x"] . "),";
+                    } elseif ($data['gm'] == 1) {
+                        $query3p .= " `csgpm-1`=(`csgpm-1`+" . $data["cs_$x"] . "),";
+                    }
                 }
                 //twsc	Teamwork Score
                 if (isset($data["twsc_$x"]) AND $data["twsc_$x"] > 0) {
@@ -812,7 +799,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 }
                 //spm	Score Per Minute
                 $query3p .= " `spm`='" . (($data2["gsco"] + $data["gsco_$x"]) / chz(($data2["tt"] + $data["tt_$x"]) / 60)) . "',";
-                $query3a .= " `_spm`='" . (($data2["_gsco"] + $data["gsco_$x"]) / chz(($data2["_ttp"] + $data["tt_$x"]) / 60)) . "',";
+                $query3a .= " `_spm`='" . ($data["gsco_$x"] / chz($data["tt_$x"] / 60)) . "',";
 
 
                 //Played for Team
@@ -910,7 +897,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 
                 //kpm	Kills Per Minute (*100)
                 $query3p .= " `kpm`='" . (($data2["klls"] + $data["klls_$x"]) / chz(($data2["tt"] + $data["tt_$x"]) / 60)) . "',";
-                $query3a .= " `_kpm`='" . (($data2["_klls"] + $data["klls_$x"]) / chz(($data2["_ttp"] + $data["tt_$x"]) / 60)) . "',";
+                $query3a .= " `_kpm`='" . ($data["klls_$x"] / chz($data["tt_$x"] / 60)) . "',";
 
 
                 //klla	Kill Assists
@@ -967,7 +954,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 
                 //dpm	Deaths Per Minute
                 $query3p .= " `dpm`='" . (($data2["dths"] + $data["dths_$x"]) / chz(($data2["tt"] + $data["tt_$x"]) / 60)) . "',";
-                $query3a .= " `_dpm`='" . (($data2["_dths"] + $data["dths_$x"]) / chz(($data2["_ttp"] + $data["tt_$x"]) / 60)) . "',";
+                $query3a .= " `_dpm`='" . ($data["dths_$x"] / chz($data["tt_$x"] / 60)) . "',";
 
                 //adpr	Deaths Per Round
                 //$query3a .= " `adpr`='" . (($data2["dths"] + $data["dths_$x"]) / chz($data2['trpm-0'] + $data2['trpm-1']) * 100) . "',";
@@ -1003,7 +990,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 //fw	Favorite Weapon
                 //ovaccu	Accuracy (*100)
                 $query3p .= " `ovaccu`='" . (($data2["toth"] + $data["toth_$x"]) / chz(($data2["tots"] + $data["tots_$x"]))) . "',";
-                $query3a .= " `_ovaccu`='" . (($data2["_toth"] + $data["toth_$x"]) / chz(($data2["_tots"] + $data["tots_$x"]))) . "',";
+                $query3a .= " `_ovaccu`='" . ($data["toth_$x"] / chz($data["tots_$x"])) . "',";
 
                 //lgdt Time of last game
                 $query3p .= " `lgdt`='" . intval($data["mapstart"]) . "',";
@@ -1417,14 +1404,14 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
 		`timestamp` = {$data['mapstart']},
 		`mapid` = {$mapid},
 		`time` = {$globals['roundtime']},
-		`team1` = {$data['ra1']},
-		`team2` = {$data['ra2']},
-		`tickets1` = {$data['rs1']},
-		`tickets2` = {$data['rs2']},
-		`pids1` = {$globals['team1_pids']},
-		`pids1_end` = {$globals['team1_pids_end']},
-		`pids2` = {$globals['team2_pids']},
-		`pids2_end` = {$globals['team2_pids_end']}		
+		`team1` = '{$data['ra1']}',
+		`team2` = '{$data['ra2']}',
+		`tickets1` = '{$data['rs1']}',
+		`tickets2` = '{$data['rs2']}',
+		`pids1` = '{$globals['team1_pids']}',
+		`pids1_end` = '{$globals['team1_pids_end']}',
+		`pids2` = '{$globals['team2_pids']}',
+		`pids2_end` = '{$globals['team2_pids_end']}'
 	";
     $result = mysql_query($query);
     checkSQLResult($result, $query);
