@@ -49,12 +49,12 @@ if (!checkSession()) {
 			//showDeletePlayersForm();
 			break;
 		case "installdb":
-			showUnderConstruction();
-			//showInstallDBForm();
+			//showUnderConstruction();
+			showInstallDBForm();
 			break;
 		case "upgradedb":
-			showUnderConstruction();
-			//showUpgradeDBForm();
+			//showUnderConstruction();
+			showUpgradeDBForm();
 			break;
 		case "cleardb":
 			//showUnderConstruction();
@@ -619,7 +619,7 @@ function showInstallDBForm() {
 	</div>
 	<div class="content" align="center">
 		<form method="POST" action="index.php" onsubmit="return confirmvalidation(this);" name="adminform">
-		<input type="hidden" name="action" value="process">
+		<input type="hidden" name="action" value="install">
 		<input type="hidden" name="task" value="installdb">
 		<table border="0" width="500" style="border: 2px solid #808080;">
 			<tbody>
@@ -683,7 +683,7 @@ function showUpgradeDBForm() {
 	</div>
 	<div class="content" align="center">
 		<form method="POST" action="index.php" onsubmit="return confirmvalidation(this);" name="adminform">
-		<input type="hidden" name="action" value="process">
+		<input type="hidden" name="action" value="upgrade">
 		<input type="hidden" name="task" value="upgradedb">
 		<table border="0" width="500" style="border: 2px solid #808080;">
 			<tbody>

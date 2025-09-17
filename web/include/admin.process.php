@@ -162,18 +162,28 @@ function processMergePlayers() {
 }
 
 function processInstallDB() {
-
+	// Process the task by making sure the module exists
+	$file = SYSTEM_PATH . DS . 'modules' . DS . 'Installdb.php';
+	// Load the module and run!
+	include $file ;
+	$Module = new Installdb();
+	$Module->Init();
 }
 
 function processUpgradeDB() {
-
+	// Process the task by making sure the module exists
+	$file = SYSTEM_PATH . DS . 'modules' . DS . 'Upgradedb.php';
+	// Load the module and run!
+	include $file ;
+	$Module = new Upgradedb();
+	$Module->Init();
 }
 
 function processClearDB() {
 	global $cfg;
 	$connection = @mysql_connect($cfg->get('db_host'), $cfg->get('db_user'), $cfg->get('db_pass'));
 	@mysql_select_db($cfg->get('db_name'), $connection) or die("Database Error: " . mysql_error());
-	$tables = array('awards','mapinfo','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks','playerprogress','round_history');
+	$tables = array('awards','mapinfo','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks','playerprogress','round_history', 'kills');
 	foreach ($tables as $table) {
 		$query1 = 'TRUNCATE TABLE `'.$table.'`;';
 		$result1 = mysql_query($query1);

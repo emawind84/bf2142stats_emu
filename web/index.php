@@ -9,7 +9,7 @@ ob_start();
 | ---------------------------------------------------------------
 */
 define('_BF2142_ADMIN', '1');
-define('CODE_VER', '1.10.1');
+define('CODE_VER', '1.11.0');
 define('CODE_VER_DATE', '2025-09-12');
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__) . DS);
@@ -76,7 +76,7 @@ if(DB_VER != CODE_VER)
 {
     $errmsg = "Database version expected: ". CODE_VER .", Found: ". DB_VER;
     ErrorLog($errmsg, 1);
-    die("<font color='red'>ERROR:</font> {$errmsg}");
+    //die("<font color='red'>ERROR:</font> {$errmsg}");
 } 
 else 
 {

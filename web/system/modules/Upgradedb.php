@@ -3,6 +3,7 @@ class Upgradedb
 {
 	public function Init() 
 	{
+		error_log(">>> processing Init!");
 		// Make sure the database if offline
 		if(DB_VER == '0.0.0')
 			redirect('home');
@@ -36,28 +37,26 @@ class Upgradedb
 	
 	public function Process()
 	{
-		// Load the config / Database
-		$DB = Database::GetConnection();
+		global $cfg;
+		$connection = @mysql_connect($cfg->get('db_host'), $cfg->get('db_user'), $cfg->get('db_pass'));
+		@mysql_select_db($cfg->get('db_name'), $connection) or die("Database Error: " . mysql_error());
+
 		$errors = array();
-		
-		// Remove our time limit!
-		ini_set('max_execution_time', 0);
 		
 		// Get DB Version
 		$curdbver = verCmp(DB_VER);
 		
 		// Import Upgrade Schema/Data
-		require( SYSTEM_PATH . DS . 'database'. DS .'sql.dbupgrade.php' );
+		require( ROOT . DS . 'include' . DS . 'db'. DS .'sql.dbupgrade.php' );
 		
 		// Process each upgrade only if the version is newer
 		foreach ($sqlupgrade as $query) 
 		{
 			if ($curdbver < verCmp($query[1])) 
 			{
-				if($DB->exec($query[2]) === false)
-				{
-					$error = $DB->errorInfo();
-					$errors[] = $query[0]." *FAILED*: ". $error[2];
+				$result = mysql_query($query[2]);
+				if (!$result) {
+					$errors[] = mysql_errno() . ':' . mysql_error() . ' Query String: ' . $query[2];
 				}
 			} 
 		}
@@ -73,21 +72,11 @@ class Upgradedb
 			}
 			$html .= '</ul>';
 			
-			echo json_encode( 
-				array(
-					'success' => false,
-					'message' => $html
-				)
-			);
+			echo $html;
 		}
 		else
 		{
-			echo json_encode( 
-				array(
-					'success' => true,
-					'message' => 'System Upgraded Successfully!'
-				)
-			);
+			echo 'System Upgraded Successfully!';
 		}
 	}
 }

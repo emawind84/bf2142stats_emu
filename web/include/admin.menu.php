@@ -24,11 +24,11 @@ if (!checkSession()) {
 		<b>Database Manager</b></div>
 	<ul class="sub-menu"><?php
 		if (DB_VER == '0.0.0') {?>
-		<li><a href="?task=installdb"><font color=\"red\"><b>Install DB</b></font></a></li>
+		<li><a href="?task=installdb"><font color="red"><b>Install DB</b></font></a></li>
 		<li><a href="?task=upgradedb">Upgrade DB</a></li><?php
 		} else {?>
 		<li><a href="?task=installdb">Install DB</a></li>
-		<li><a href="?task=upgradedb"><font color=\"red\"><b>Upgrade DB</b></font></a></li><?php
+		<li><a href="?task=upgradedb"><font color="red"><b>Upgrade DB</b></font></a></li><?php
 		}?>
 	</ul>
 	<div class="main-menu">
@@ -51,11 +51,11 @@ if (!checkSession()) {
 		<li><a href="?task=installdb">Install DB</a></li>
 		<li><a href="?task=upgradedb">Upgrade DB</a></li><?php
 	} elseif (DB_VER == '0.0.0') {?>
-		<li><a href="?task=installdb"><font color=\"red\"><b>Install DB</b></font></a></li>
+		<li><a href="?task=installdb"><font color="red"><b>Install DB</b></font></a></li>
 		<li><a href="?task=upgradedb">Upgrade DB</a></li><?php
 	} else {?>
 		<li><a href="?task=installdb">Install DB</a></li>
-		<li><a href="?task=upgradedb"><font color=\"red\"><b>Upgrade DB</b></font></a></li><?php
+		<li><a href="?task=upgradedb"><font color="red"><b>Upgrade DB</b></font></a></li><?php
 	}?>
 		<li><a href="?task=cleardb">Clear DB</a></li>
 		<li><a href="?task=backupdb">Backup DB</a></li>
