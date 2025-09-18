@@ -265,9 +265,9 @@ $globals['mode3'] = 3; // Mode: gpm_coop	= Co-op (ie, 'Bots)
 if (isset($data["gm"])) {
     // Unknown will get set to 99, which effectively ignores this mode
     $globals["mode" . $data["gm"]] = 1;
-    // if ($data["gm"] == 3) {
-    //     $data["gm"] = 0;
-    // }
+    if ($data["gm"] == 3) {
+        $data["gm"] = 0;
+    }
 }
 
 

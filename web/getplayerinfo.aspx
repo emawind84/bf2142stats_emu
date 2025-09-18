@@ -355,7 +355,6 @@ D\t524";
     } elseif ($mode == "titan") {
 
         $query1 = "SELECT pid, nick, tid, tas, tdrps, tds, tgr, tgd, tcd, tcrd, tt AS ttp, trp, cts FROM `playerprogress` p " .
-               // " WHERE p.pid='" . $authPID . "' AND gm=1 LIMIT 1";
 			   " WHERE p.pid='" . $authPID . "' LIMIT 1";
         $result1 = mysql_query($query1) or die(mysql_error());
         if (!mysql_num_rows($result1)) {

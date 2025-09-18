@@ -183,12 +183,17 @@ function processClearDB() {
 	global $cfg;
 	$connection = @mysql_connect($cfg->get('db_host'), $cfg->get('db_user'), $cfg->get('db_pass'));
 	@mysql_select_db($cfg->get('db_name'), $connection) or die("Database Error: " . mysql_error());
-	$tables = array('awards','mapinfo','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks','playerprogress','round_history', 'kills');
+	$tables = array('awards','stats_a','stats_e','stats_m','stats_v','stats_w','unlocks','playerprogress','round_history', 'kills');
 	foreach ($tables as $table) {
 		$query1 = 'TRUNCATE TABLE `'.$table.'`;';
 		$result1 = mysql_query($query1);
 		checkSQLResult ($result1, $query1);
 	}
+	// reset mapinfo data without removing generated mapids
+	$reset_mapinfo = "UPDATE mapinfo SET  score = 0, time = 0, times = 0, kills = 0, deaths = 0";
+	$result1 = mysql_query($reset_mapinfo);
+	checkSQLResult ($result1, $reset_mapinfo);
+
 	showLog("Done!");
 }
 

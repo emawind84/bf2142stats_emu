@@ -113,8 +113,12 @@ def has_rank (rank):
 # game functions
 
 def game_mode_time (mode, value = None):
+	if mode == 0:
+		mode = [0, 3]
+	else:
+		mode = [mode]
 	def _game_mode_time (player):
-		if int(getGameModeId(bf2.serverSettings.getGameMode())) == mode:
+		if int(getGameModeId(bf2.serverSettings.getGameMode())) in mode:
 			if value:
 				return 1
 			else:
@@ -125,15 +129,19 @@ def game_mode_time (mode, value = None):
 
 
 def game_mode_kills (mode, value=None):
+	if mode == 0:
+		mode = [0, 3]
+	else:
+		mode = [mode]
 	if value == None:
 		def _game_mode_kills (player):			
-			if int(getGameModeId(bf2.serverSettings.getGameMode())) == mode:
+			if int(getGameModeId(bf2.serverSettings.getGameMode())) in mode:
 				return player.score.kills
 			else:
 				return 0
 	else:		
 		def _game_mode_kills (player):
-			if int(getGameModeId(bf2.serverSettings.getGameMode())) == mode:
+			if int(getGameModeId(bf2.serverSettings.getGameMode())) in mode:
 				return player.score.kills >= value
 			else:
 				return False
