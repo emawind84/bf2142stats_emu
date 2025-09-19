@@ -24,17 +24,6 @@ IndexIgnore *
 	RewriteRule ^nbproject/ - [R=403,L,NC]
 	RewriteRule ^.*\.(txt)$ - [R=403,L,NC]
 
-    # Don't redirect direct links to non-existent files or directories to the index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-
-    # Don't redirect direct links to non-existent files or directories to the index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-
-    # Don't redirect direct links to non-existent files or directories to the index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
 </IfModule>
 <IfModule !mod_rewrite.c>
     # Tell PHP that the mod_rewrite module is DISABLED.
