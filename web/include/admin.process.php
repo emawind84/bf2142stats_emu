@@ -300,7 +300,7 @@ function processImportPlayers() {
 	showLog("include ea_support.php");
 	require_once(ROOT . DS . "ea_support.php");
 	showLog("Done! :)");
-	$bfcoding  = &new ea_stats();
+	$bfcoding  = new ea_stats();
 
 	$timestamp = '';
 	$timestamp = time();

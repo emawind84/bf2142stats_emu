@@ -131,7 +131,9 @@ if($action == 'Get Auth Key') {
 	$test = array();
 	$test['1']	= 'getawardsinfo.aspx?pid='.$pid.'&auth='.$auth;
 	$test['2']	= 'getbackendinfo.aspx?auth='.$auth;
-	$test['3']	= 'getleaderboard.aspx?auth='.$auth.'&pos=1&after=17&type=overallscore';
+	$test['3a']	= 'getleaderboard.aspx?auth='.$auth.'&pos=1&after=17&type=overallscore';
+	$test['3b']	= 'getleaderboard.aspx?auth='.$auth.'&pos=1&after=17&type=commanderscore';
+	$test['3c']	= 'getleaderboard.aspx?auth='.$auth.'&pos=1&after=17&type=risingstar';
 	$test['4a']	= 'getplayerinfo.aspx?auth='.$auth.'&mode=base';
 	$test['4b']	= 'getplayerinfo.aspx?auth='.$auth.'&mode=ovr';
 	$test['4c']	= 'getplayerinfo.aspx?auth='.$auth.'&mode=award';

@@ -390,10 +390,145 @@ else if ($type == 'efficienty')
 }
 else if ($type == 'commanderscore')
 {
+	$query = "SELECT COUNT(t.pid) as cnt FROM playerprogress t 
+	left join subaccount s on s.id = t.pid 
+	WHERE $WHERE AND cs > -1";
+
+	// ErrorLog(">>> $query", 3);
+	$res = mysql_query($query);
+	checkSQLResult($res, $query);
+	$row = mysql_fetch_array($res);
+	$count = $row['cnt'];
+	$out .= "D\t{$count}\t" . time() . "\n";
+	
+	$core_query = "SELECT
+		t.nick, t.pid, t.rnk, t.cs,
+		coalesce(s.country,'US') AS country,
+		(SELECT coalesce(sum(cnt),0) FROM dogtag_events de WHERE de.victim_id = t.pid AND de.killer_id = '{$authPID}') AS dt,
+		(SELECT COUNT(*)+1 FROM playerprogress a WHERE a.cs > t.cs) AS rank
+	FROM
+		playerprogress t
+		left join subaccount s on s.id = t.pid
+	";
+
+	// ### START PLAYER DATA ###
+	$query = $core_query . " WHERE t.pid = '{$authPID}'";
+	// ErrorLog(">>> $query", 3);
+	$res = mysql_query($query);
+	checkSQLResult($res, $query);
+	$out .= "H\trank\tpos\tpid\tnick\tcoscore\tplayerrank\tcountrycode\tVet\t\n";
+	while ($row = mysql_fetch_array($res))
+	{
+		$plpid = $row['pid'];
+		$name = $row['nick'];
+		$playerrank = $row['rnk'];
+		$rank = $row['rank'];
+		$country = strtoupper($row['country']);
+		$coscore = $row['cs'];
+		$out .= "D\t$rank\t1\t$plpid\t$name\t$coscore\t$playerrank\t$country\t0\t\n";
+	}
+	// ### END PLAYER DATA ###
+
+	// ### START LEADERBOARD DATA ###
+	if ($count > 0)
+	{
+		$out .= "H\trank\tpos\tpid\tnick\tcoscore\tplayerrank\tcountrycode\tVet\tdt\t\n";
+		$query = $core_query . " WHERE $WHERE AND `cs` > -1 ORDER BY cs DESC, nick DESC";
+		if (!$pid)
+			$query .= " LIMIT {$offset}, {$rowcount}";
+
+		// ErrorLog(">>> $query", 3);
+		$res = mysql_query($query);
+		checkSQLResult($res, $query);
+		while ($row = mysql_fetch_array($res))
+		{
+			$plpid = $row['pid'];
+			$name = $row['nick'];
+			$playerrank = $row['rnk'];
+			$rank = $row['rank'];
+			$country = strtoupper($row['country']);
+			$dogtags = $row['dt'];
+			$coscore = $row['cs'];
+			$out .= "D\t$rank\t" . $pos++ . "\t$plpid\t$name\t$coscore\t$playerrank\t$country\t0\t$dogtags\t\n";
+		}
+	}
+	// ### END LEADERBOARD DATA ###
 
 }
 else if ($type == 'risingstar')
 {
+	$query = "SELECT COUNT(DISTINCT(t.pid)) as cnt FROM playerprogress t 
+	left join subaccount s on s.id = t.pid 
+	left join stats_a sa on sa.pid = t.pid
+	WHERE $WHERE AND _gsco > -1 and _lgdt >= (UNIX_TIMESTAMP() - (60*60*24*7))";
+
+	// ErrorLog(">>> $query", 3);
+	$res = mysql_query($query);
+	checkSQLResult($res, $query);
+	$row = mysql_fetch_array($res);
+	$count = $row['cnt'];
+	$out .= "D\t{$count}\t" . time() . "\n";
+	
+	$core_query = "SELECT
+		t.nick, t.pid, t.rnk, sum(sa._gsco) as weeklyscore,
+		coalesce(s.country,'US') AS country,
+		(SELECT coalesce(sum(cnt),0) FROM dogtag_events de WHERE de.victim_id = t.pid AND de.killer_id = '{$authPID}') AS dt,
+		(SELECT COUNT(*)+1 FROM stats_a a WHERE a._gsco > sa._gsco) AS rank
+	FROM
+		playerprogress t
+		left join subaccount s on s.id = t.pid
+		left join stats_a sa on sa.pid = t.pid
+	";
+
+	// ### START PLAYER DATA ###
+	$query = $core_query . " WHERE t.pid = '{$authPID}' 
+	AND _lgdt >= (UNIX_TIMESTAMP() - (60*60*24*7)) 
+	GROUP BY t.pid";
+	// ErrorLog(">>> $query", 3);
+	$res = mysql_query($query);
+	checkSQLResult($res, $query);
+
+	$out .= "H\trank\tpos\tpid\tnick\tPercentChange\tplayerrank\tcountrycode\tVet\t\n";
+	while ($row = mysql_fetch_array($res))
+	{
+		$plpid = $row['pid'];
+		$name = $row['nick'];
+		$playerrank = $row['rnk'];
+		$rank = $row['rank'];
+		$country = strtoupper($row['country']);
+		$weeklyscore = $row['weeklyscore'];
+		$out .= "D\t$rank\t1\t$plpid\t$name\t$weeklyscore\t$playerrank\t$country\t0\t\n";
+	}
+	// ### END PLAYER DATA ###
+
+	// ### START LEADERBOARD DATA ###
+	if ($count > 0)
+	{
+		$out .= "H\trank\tpos\tpid\tnick\tPercentChange\tplayerrank\tcountrycode\tVet\tdt\t\n";
+		$query = $core_query . " WHERE $WHERE AND `_gsco` > -1 
+		AND _lgdt >= (UNIX_TIMESTAMP() - (60*60*24*7)) 
+		GROUP BY t.pid
+		ORDER BY weeklyscore DESC, t.nick DESC";
+		if (!$pid)
+			$query .= " LIMIT {$offset}, {$rowcount}";
+
+		// ErrorLog(">>> $query", 3);
+		$res = mysql_query($query);
+		checkSQLResult($res, $query);
+		while ($row = mysql_fetch_array($res))
+		{
+			$plpid = $row['pid'];
+			$name = $row['nick'];
+			$playerrank = $row['rnk'];
+			$rank = $row['rank'];
+			$country = strtoupper($row['country']);
+			$weeklyscore = $row['weeklyscore'];
+			$dogtags = $row['dt'];
+			$out .= "D\t$rank\t" . $pos++ . "\t$plpid\t$name\t$weeklyscore\t$playerrank\t$country\t0\t$dogtags\t\n";
+		}
+	}
+	// ### END LEADERBOARD DATA ###
+
 
 }
 else if ($type == 'supremecommander')

@@ -754,6 +754,12 @@ $sqlupgrade[] = array('Add comment to csgpm-0 in playerprogress', '1.11.1',
 (116, 'fall_of_berlin_coop', 0, 0, 0, 0, 0, 0);
 ");
 
+$sqlupgrade[] = array('Change global score to signed int', '1.11.1',
+"ALTER TABLE playerprogress MODIFY COLUMN gsco int NOT NULL COMMENT 'general score';");
+
+$sqlupgrade[] = array('Change score in mapinfo to bigint', '1.11.1',
+"ALTER TABLE mapinfo MODIFY COLUMN score bigint DEFAULT 0 NOT NULL;");
+
 
 
 
