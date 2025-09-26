@@ -762,6 +762,85 @@ $sqlupgrade[] = array('Change score in mapinfo to bigint', '1.11.1',
 
 
 
+$sqlupgrade[] = array('Fix joined and lastonline date for player stats', '1.11.2',
+"CREATE OR REPLACE
+algorithm = UNDEFINED view `player` as
+select
+    `pp`.`pid` as `id`,
+    `pp`.`rnk` as `rank`,
+    `sa`.`country` as `country`,
+    `pp`.`nick` as `name`,
+    `pp`.`tt` as `time`,
+    `pp`.`spm` as `spm`,
+    `pp`.`kdr` as `kdr`,
+    `pp`.`resp` as `ammos`,
+    `pp`.`unavl` as `availunlocks`,
+    `pp`.`ban` as `banned`,
+    `pp`.`capa` as `captureassists`,
+    `pp`.`captures` as `captures`,
+    '0' as `chng`,
+    '' as `clantag`,
+    `pp`.`cs` as `cmdscore`,
+    `pp`.`tac` as `cmdtime`,
+    `pp`.`klla` as `damageassists`,
+    `pp`.`dths` as `deaths`,
+    `pp`.`dstrk` as `deathstreak`,
+    '0' as `decr`,
+    `pp`.`dcpt` as `defends`,
+    `pp`.`dass` as `driverassists`,
+    '0' as `driverspecials`,
+    `pp`.`hls` as `heals`,
+    '0' as `hidden`,
+    `sa`.`ip` as `ip`,
+    '0' as `isbot`,
+    `pp`.`acdt` as `joined`,
+    `pp`.`kick` as `kicked`,
+    `pp`.`klls` as `kills`,
+    `pp`.`klstrk` as `killstreak`,
+    `pp`.`lgdt` as `lastonline`,
+    `pp`.`los` as `losses`,
+    `pp`.`talw` as `lwtime`,
+    '0' as `mode0`,
+    '0' as `mode1`,
+    '0' as `mode2`,
+    '0' as `neutralizeassits`,
+    `pp`.`ncpt` as `neutralizes`,
+    '0' as `passengerassists`,
+    '0' as `permban`,
+    `pp`.`rps` as `repairs`,
+    `pp`.`rvs` as `revives`,
+    `pp`.`brs` as `rndscore`,
+    (
+    select
+        sum((`sm`.`mwin` + `sm`.`mlos`))
+    from
+        `stats_m` `sm`
+    where
+        (`sm`.`pid` = `pp`.`pid`)) as `rounds`,
+    `pp`.`gsco` as `score`,
+    '0' as `skillscore`,
+    `pp`.`tasl` as `sqltime`,
+    `pp`.`tasm` as `sqmtime`,
+    `pp`.`suic` as `suicides`,
+    '0' as `targetassists`,
+    `pp`.`tdmg` as `teamdamage`,
+    `pp`.`tkls` as `teamkills`,
+    `pp`.`twsc` as `teamscore`,
+    `pp`.`tvdmg` as `teamvehicledamage`,
+    `pp`.`unlc` as `usedunlocks`,
+    `pp`.`wins` as `wins`,
+    `pp`.`fe` as `fe`,
+    `pp`.`fgm` as `fgm`,
+    `pp`.`fk` as `fk`,
+    `pp`.`fm` as `fm`,
+    `pp`.`fv` as `fv`,
+    `pp`.`fw` as `fw`
+from
+    (`playerprogress` `pp`
+left join `subaccount` `sa` on
+    ((`pp`.`pid` = `sa`.`id`)));");
+
+
 
 $sqlupgrade[] = array('Update Version Table', CODE_VER,
 	"INSERT INTO `_version` VALUES ('". CODE_VER ."', ".time().");");

@@ -9,8 +9,8 @@ ob_start();
 | ---------------------------------------------------------------
 */
 define('_BF2142_ADMIN', '1');
-define('CODE_VER', '1.11.0');
-define('CODE_VER_DATE', '2025-09-12');
+define('CODE_VER', '1.11.2');
+define('CODE_VER_DATE', '2025-09-26');
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__) . DS);
 define('SYSTEM_PATH', ROOT . DS . 'system');

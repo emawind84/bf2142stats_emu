@@ -8,8 +8,8 @@ ob_start();
 | Define Constants
 | ---------------------------------------------------------------
 */
-define('CODE_VER', '1.11.0');
-define('CODE_VER_DATE', '2025-09-12');
+define('CODE_VER', '1.11.2');
+define('CODE_VER_DATE', '2025-09-26');
 define('DS', DIRECTORY_SEPARATOR);
 define('ROOT', dirname(__FILE__));
 define('SYSTEM_PATH', ROOT . DS . 'system');
