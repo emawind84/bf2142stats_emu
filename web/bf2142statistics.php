@@ -996,6 +996,11 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                 $query3p .= " `lgdt`='" . intval($data["mapstart"]) . "',";
                 $query3a .= " `_lgdt`='" . intval($data["mapstart"]) . "',";
 
+                // set joined date to mapstart if not set
+                if (!isset($data2['acdt']) OR intval($data2['acdt']) > intval($data["mapstart"])) {
+                    $query3p .= " `acdt`='" . intval($data["mapstart"]) . "',";
+                }
+
                 //--------------------------------------------------------------------------------------------------------------------
                 $w_array = array("wdths", "wkls", "wtp", "wbf", "wbh"); // "waccu-",
                 for ($w = 0; $w <49; $w++) {
