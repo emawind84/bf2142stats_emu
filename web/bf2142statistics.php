@@ -402,7 +402,7 @@ if ($data['pc'] >= $cfg->get('stats_players_min') && $globals['roundtime'] >= $c
                     ErrorLog("Player (" . $data["pid_$x"] . ") not found in `subaccount`.", 3);
                     
                     // Find country
-                    $query = "SELECT `country` FROM `ip2nation` WHERE `ip` < INET_ATON(" . $data["ip_$x"] . ") ORDER BY `ip` DESC LIMIT 1";
+                    $query = "SELECT `country` FROM `ip2nation` WHERE `ip` < INET_ATON('" . $data["ip_$x"] . "') ORDER BY `ip` DESC LIMIT 1";
                     $result_tmp1 = mysql_query($query);
                     $countryRow = mysql_fetch_assoc($result_tmp1);
                     $country = $countryRow['country'];
